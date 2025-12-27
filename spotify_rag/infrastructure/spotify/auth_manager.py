@@ -25,19 +25,19 @@ class SpotifyAuthManager:
         return self._oauth
 
     def get_auth_url(self) -> str:
-        return self.oauth.get_authorize_url()
+        return self.oauth.get_authorize_url()  # type: ignore[no-any-return]
 
     def get_access_token(self, code: str) -> dict[str, Any] | None:
         try:
-            return self.oauth.get_access_token(code, as_dict=True)
+            return self.oauth.get_access_token(code, as_dict=True)  # type: ignore[no-any-return]
         except Exception:
             return None
 
     def get_cached_token(self) -> dict[str, Any] | None:
-        return self.oauth.get_cached_token()
+        return self.oauth.get_cached_token()  # type: ignore[no-any-return]
 
     def refresh_token(self, refresh_token: str) -> dict[str, Any] | None:
         try:
-            return self.oauth.refresh_access_token(refresh_token)
+            return self.oauth.refresh_access_token(refresh_token)  # type: ignore[no-any-return]
         except Exception:
             return None

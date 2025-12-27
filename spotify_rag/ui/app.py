@@ -169,7 +169,7 @@ def render_sidebar() -> None:
 def handle_oauth_callback() -> str | None:
     """Handle OAuth callback and extract authorization code."""
     query_params = st.query_params
-    return query_params.get("code")  # type: ignore[no-any-return]
+    return query_params.get("code")
 
 
 def initialize_session_state() -> None:
@@ -221,7 +221,7 @@ def app() -> None:
                 st.session_state.access_token = token_info["access_token"]
 
                 # Get user profile
-                client = SpotifyClient(token_info["access_token"])
+                client = SpotifyClient(access_token=token_info["access_token"])
                 st.session_state.user = client.current_user
 
                 # Clear the URL parameters
@@ -237,7 +237,7 @@ def app() -> None:
             st.session_state.authenticated = True
             st.session_state.access_token = cached_token["access_token"]
 
-            client = SpotifyClient(cached_token["access_token"])
+            client = SpotifyClient(access_token=cached_token["access_token"])
             st.session_state.user = client.current_user
 
     # Main content

@@ -26,7 +26,7 @@ class SpotifyClient(BaseModel):
         limit: int = 50,
         offset: int = 0,
     ) -> dict[str, Any]:
-        return self.client.current_user_saved_tracks(limit=limit, offset=offset)
+        return self.client.current_user_saved_tracks(limit=limit, offset=offset)  # type: ignore[no-any-return]
 
     def get_all_liked_songs(self, max_tracks: int = 500) -> list[SavedTrack]:
         """Fetch all liked songs with pagination.
