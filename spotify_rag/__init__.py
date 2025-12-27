@@ -1,1 +1,1 @@
-# Spotify RAG - Semantic Vibe Searcher
+__version__ = "0.0.1"

@@ -1,3 +1,7 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "spotify-rag"
 version = "0.0.1"
@@ -28,6 +32,10 @@ dev = [
   "ipykernel>=7.1",
   "poethepoet>=0.37",
   "pre-commit>=4.4",
+]
+
+build = [
+  "build>=1.0",
 ]
 
 [tool.ruff]
@@ -101,6 +109,7 @@ disable_error_code = [ "var-annotated" ]
 [tool.poe.tasks]
 dev = "streamlit run spotify_rag/main.py"
 format = "pre-commit run --all-files --verbose"
+build = "pip install -e ."
 
 ##################################
 # ruff configuration             #
@@ -109,7 +118,7 @@ format = "pre-commit run --all-files --verbose"
 [tool.semantic_release]
 branch = "main"
 commit_message = "chore(release): release version {version}"
-version_variables = [ "tx_lens/__init__.py:__version__" ]
+version_variables = [ "spotify_rag/__init__.py:__version__" ]
 
 [tool.semantic_release.branches.main]
 match = "(main|master)"
