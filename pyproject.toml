@@ -1,0 +1,147 @@
+[project]
+name = "spotify-rag"
+version = "0.0.1"
+description = "Spotify RAG is an AI system that converts raw blockchain transactions into clear, human-readable explanations"
+readme = "README.md"
+license = { text = "MIT" }
+
+authors = [ { name = "Matias Gimenez", email = "matiasgimenez.dev@gmail.com" } ]
+requires-python = ">=3.12"
+dependencies = [
+    "pydantic-settings>=2.0.0",
+    "python-dotenv>=1.2.1",
+    "spotipy>=2.25.2",
+    "streamlit>=1.52.2",
+]
+
+[project.urls]
+repository = "https://github.com/matiagimenez/spotify-rag"
+
+[tool.setuptools]
+packages = ["spotify_rag"]
+
+[dependency-groups]
+dev = [
+  "ipykernel>=7.1",
+  "poethepoet>=0.37",
+  "pre-commit>=4.4",
+]
+
+[tool.ruff]
+line-length = 88
+exclude = [
+  ".git",
+  ".mypy_cache",
+  ".pyenv",
+  ".pytest_cache",
+  ".pytype",
+  ".ruff_cache",
+  ".venv",
+  ".vscode",
+  "_build",
+  "buck-out",
+  "build",
+  "dist",
+  "playground",
+  "site-packages",
+  "venv",
+]
+
+preview = true
+fix = true
+format.indent-style = "space"
+format.quote-style = "double"
+format.line-ending = "auto"
+format.skip-magic-trailing-comma = false
+
+[tool.pylint]
+disable = [
+  "missing-docstring",
+  "missing-module-docstring",
+  "missing-function-docstring",
+  "too-few-public-methods",
+  "astroid-error",
+]
+load-plugins = [
+  "pylint.extensions.bad_builtin",
+  "pylint.extensions.code_style",
+  "pylint.extensions.comparison_placement",
+  "pylint.extensions.consider_refactoring_into_while_condition",
+  "pylint.extensions.dunder",
+  "pylint.extensions.eq_without_hash",
+  "pylint.extensions.for_any_all",
+  "pylint.extensions.mccabe",
+  "pylint.extensions.no_self_use",
+  "pylint.extensions.overlapping_exceptions",
+  "pylint.extensions.private_import",
+  "pylint.extensions.redefined_loop_name",
+  "pylint.extensions.set_membership",
+]
+
+##################################
+# semantic release configuration #
+##################################
+
+[tool.mypy]
+python_version = "3.13"
+disallow_untyped_defs = true
+show_error_codes = true
+no_implicit_optional = true
+warn_return_any = true
+warn_unused_ignores = true
+disable_error_code = [ "var-annotated" ]
+
+##################################
+# pylint configuration           #
+##################################
+
+[tool.poe.tasks]
+dev = "streamlit run spotify_rag/main.py"
+format = "pre-commit run --all-files --verbose"
+
+##################################
+# ruff configuration             #
+##################################
+
+[tool.semantic_release]
+branch = "main"
+commit_message = "chore(release): release version {version}"
+version_variables = [ "tx_lens/__init__.py:__version__" ]
+
+[tool.semantic_release.branches.main]
+match = "(main|master)"
+prerelease_token = "rc"
+prerelease = false
+
+[tool.semantic_release.changelog.default_templates]
+changelog_file = "CHANGELOG.md"
+
+[tool.semantic_release.commit_author]
+env = "GIT_COMMIT_AUTHOR"
+default = "semantic-release <semantic-release>"
+
+[tool.semantic_release.changelog.environment]
+block_start_string = "{%"
+block_end_string = "%}"
+variable_start_string = "{{"
+variable_end_string = "}}"
+comment_start_string = "{#"
+comment_end_string = "#}"
+trim_blocks = false
+lstrip_blocks = false
+newline_sequence = "\n"
+keep_trailing_newline = false
+extensions = [  ]
+autoescape = true
+
+[tool.semantic_release.commit_parser_options]
+allowed_tags = [ "chore", "docs", "feat", "fix", "refactor" ]
+minor_tags = [ "feat" ]
+patch_tags = [ "fix", "perf" ]
+default_bump_level = 0
+
+[tool.semantic_release.remote]
+name = "origin"
+type = "github"
+ignore_token_for_push = false
+insecure = false
