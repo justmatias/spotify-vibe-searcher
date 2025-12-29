@@ -47,6 +47,31 @@ class AppSettings(BaseSettings):
         description="Directory for storing application data",
     )
 
+    CHROMADB_COLLECTION: str = Field(
+        default="tracks",
+        description="ChromaDB collection name",
+    )
+
+    EMBEDDING_MODEL: str = Field(
+        default="nomic-embed-text:v1.5",
+        description="Embedding model to use",
+    )
+
+    LLM_BASE_URL: str = Field(
+        default="http://localhost:11434",
+        description="LLM API base URL",
+    )
+
+    LLM_MODEL: str = Field(
+        default="llama3.2:3b",
+        description="LLM model for semantic analysis",
+    )
+
+    TEMPERATURE: float = Field(
+        default=0.7,
+        description="Temperature for LLM generation",
+    )
+
     @property
     def CHROMADB_PATH(self) -> Path:
         """Path to ChromaDB persistent storage."""

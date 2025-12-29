@@ -131,7 +131,7 @@ def app() -> None:
         # Ensure cache directory exists
         Settings.CACHE_PATH.mkdir(parents=True, exist_ok=True)
 
-    except Exception as e:  # pylint: disable=broad-exception-caught
+    except Exception as e:
         render_sidebar()
         render_hero_section()
         st.error(f"⚠️ Configuration Error: {str(e)}")
