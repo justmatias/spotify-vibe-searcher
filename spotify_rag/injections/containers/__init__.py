@@ -1,5 +1,3 @@
-"""Containers module."""
-
 from .infrastructure import InfrastructureContainer
 from .services import ServicesContainer
 
