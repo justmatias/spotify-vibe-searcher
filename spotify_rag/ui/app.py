@@ -6,7 +6,8 @@ A beautiful Streamlit UI for Spotify authentication and music discovery.
 import streamlit as st
 
 from spotify_rag.domain import SpotifyUser
-from spotify_rag.infrastructure import SpotifyAuthManager, SpotifyClient
+from spotify_rag.infrastructure import SpotifyAuthManager
+from spotify_rag.injections import container
 from spotify_rag.utils import Settings
 
 from .components import (
@@ -15,6 +16,7 @@ from .components import (
     render_hero_section,
     render_login_button,
     render_sidebar,
+    render_sync_library_section,
     render_user_profile,
 )
 from .config import (
@@ -37,8 +39,11 @@ def authenticate_with_code(auth_manager: SpotifyAuthManager, code: str) -> None:
             st.session_state.authenticated = True
             st.session_state.access_token = token_info["access_token"]
 
-            # Get user profile
-            client = SpotifyClient(access_token=token_info["access_token"])
+            # Get user profile using DI container
+            container.infrastructure.config.spotify.access_token.from_value(
+                token_info["access_token"]
+            )
+            client = container.infrastructure.spotify_client()
             st.session_state.user = client.current_user
 
             # Clear the URL parameters
@@ -50,11 +55,16 @@ def authenticate_with_code(auth_manager: SpotifyAuthManager, code: str) -> None:
 
 def check_cached_token(auth_manager: SpotifyAuthManager) -> None:
     """Check for and restore cached authentication token."""
+
     if cached_token := auth_manager.get_cached_token():
         st.session_state.authenticated = True
         st.session_state.access_token = cached_token["access_token"]
 
-        client = SpotifyClient(access_token=cached_token["access_token"])
+        # Get user profile using DI container
+        container.infrastructure.config.spotify.access_token.from_value(
+            cached_token["access_token"]
+        )
+        client = container.infrastructure.spotify_client()
         st.session_state.user = client.current_user
 
 
@@ -66,10 +76,21 @@ def render_authenticated_view(user: SpotifyUser) -> None:
 
         st.markdown("### 🚀 What's Next?")
 
+        track_limit = st.slider(
+            "How many recent songs to analyze?",
+            min_value=5,
+            max_value=100,
+            value=20,
+            step=5,
+        )
+        st.caption("⚠️ Analyzing lyrics takes time (approx 2-3 seconds per song).")
+
         col_a, col_b = st.columns(2)
         with col_a:
-            if st.button("📥 Sync Library", use_container_width=True):
-                st.info("🔄 Library sync coming soon!")
+            render_sync_library_section(
+                access_token=st.session_state.access_token,
+                track_limit=track_limit,
+            )
 
         with col_b:
             if st.button("🔍 Search Vibes", use_container_width=True):
