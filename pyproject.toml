@@ -19,7 +19,9 @@ dependencies = [
     "loguru>=0.7.3",
     "pydantic>=2.12.4",
     "pydantic-settings>=2.12",
+    "dependency-injector>=4.48.3",
 ]
+
 
 [project.urls]
 repository = "https://github.com/matiagimenez/spotify-rag"
