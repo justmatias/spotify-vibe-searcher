@@ -20,7 +20,7 @@ class GeniusClient(BaseModel):
             remove_section_headers=True,
         )
 
-    def _sanitize_title(self, title: str) -> str:
+    def _sanitize_title(self, title: str) -> str:  # pylint: disable=no-self-use
         """Clean the title to improve search hit rate.
 
         Removes:

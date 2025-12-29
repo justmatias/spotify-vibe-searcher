@@ -31,3 +31,6 @@ var/
 
 # Playground
 playground/
+
+# Tests
+.coverage

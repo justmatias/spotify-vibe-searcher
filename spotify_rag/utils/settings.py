@@ -1,3 +1,4 @@
+# pylint: disable=invalid-name
 """Application configuration using Pydantic BaseSettings."""
 
 from functools import lru_cache

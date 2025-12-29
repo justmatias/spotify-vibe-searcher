@@ -25,5 +25,5 @@ def get_logger() -> Logger:
 
 
 def log(message: str, log_level: LogLevel = LogLevel.INFO) -> None:
-    logger = get_logger()
-    logger.log(log_level.value, message)
+    logger_ = get_logger()
+    logger_.log(log_level.value, message)

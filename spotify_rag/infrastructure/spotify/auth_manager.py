@@ -1,3 +1,4 @@
+import contextlib
 from dataclasses import dataclass
 from typing import Any
 
@@ -31,10 +32,9 @@ class SpotifyAuthManager:
         return self.oauth.get_authorize_url()  # type: ignore[no-any-return]
 
     def get_access_token(self, code: str) -> dict[str, Any] | None:
-        try:
+        with contextlib.suppress(Exception):
             return self.oauth.get_access_token(code, as_dict=True)  # type: ignore[no-any-return]
-        except Exception:
-            return None
+        return None
 
     def get_cached_token(self) -> dict[str, Any] | None:
         token_info = self.oauth.cache_handler.get_cached_token()
@@ -43,7 +43,6 @@ class SpotifyAuthManager:
         return self.oauth.validate_token(token_info)  # type: ignore[no-any-return]
 
     def refresh_token(self, refresh_token: str) -> dict[str, Any] | None:
-        try:
+        with contextlib.suppress(Exception):
             return self.oauth.refresh_access_token(refresh_token)  # type: ignore[no-any-return]
-        except Exception:
-            return None
+        return None

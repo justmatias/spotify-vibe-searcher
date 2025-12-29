@@ -1,4 +1,10 @@
-from .track import SavedTrack, SpotifyAlbum, SpotifyArtist, SpotifyImage, SpotifyTrack
+from .track import (
+    SavedTrack,
+    SpotifyAlbum,
+    SpotifyArtist,
+    SpotifyImage,
+    SpotifyTrack,
+)
 from .user import SpotifyUser
 
 __all__ = [

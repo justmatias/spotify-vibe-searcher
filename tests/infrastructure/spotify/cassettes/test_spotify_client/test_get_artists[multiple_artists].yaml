@@ -1,0 +1,63 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Authorization:
+      - Bearer MOCKED_TOKEN
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json
+      User-Agent:
+      - python-requests/2.32.5
+    method: GET
+    uri: https://api.spotify.com/v1/artists/?ids=1Xyo4u8uXC1ZmMpatF05PJ%2C3TVXtAsR1Inumwj472S9r4
+  response:
+    body:
+      string: '{"artists":[{"external_urls":{"spotify":"https://open.spotify.com/artist/1Xyo4u8uXC1ZmMpatF05PJ"},"followers":{"href":null,"total":116219359},"genres":[],"href":"https://api.spotify.com/v1/artists/1Xyo4u8uXC1ZmMpatF05PJ","id":"1Xyo4u8uXC1ZmMpatF05PJ","images":[{"url":"https://i.scdn.co/image/ab6761610000e5eb9e528993a2820267b97f6aae","height":640,"width":640},{"url":"https://i.scdn.co/image/ab676161000051749e528993a2820267b97f6aae","height":320,"width":320},{"url":"https://i.scdn.co/image/ab6761610000f1789e528993a2820267b97f6aae","height":160,"width":160}],"name":"The
+        Weeknd","popularity":96,"type":"artist","uri":"spotify:artist:1Xyo4u8uXC1ZmMpatF05PJ"},{"external_urls":{"spotify":"https://open.spotify.com/artist/3TVXtAsR1Inumwj472S9r4"},"followers":{"href":null,"total":105373671},"genres":["rap"],"href":"https://api.spotify.com/v1/artists/3TVXtAsR1Inumwj472S9r4","id":"3TVXtAsR1Inumwj472S9r4","images":[{"url":"https://i.scdn.co/image/ab6761610000e5eb4293385d324db8558179afd9","height":640,"width":640},{"url":"https://i.scdn.co/image/ab676161000051744293385d324db8558179afd9","height":320,"width":320},{"url":"https://i.scdn.co/image/ab6761610000f1784293385d324db8558179afd9","height":160,"width":160}],"name":"Drake","popularity":98,"type":"artist","uri":"spotify:artist:3TVXtAsR1Inumwj472S9r4"}]}'
+    headers:
+      Transfer-Encoding:
+      - chunked
+      access-control-allow-credentials:
+      - 'true'
+      access-control-allow-headers:
+      - Accept, App-Platform, Authorization, Content-Type, Origin, Retry-After, Spotify-App-Version,
+        X-Cloud-Trace-Context, client-token, content-access-token
+      access-control-allow-methods:
+      - GET, POST, OPTIONS, PUT, DELETE, PATCH
+      access-control-allow-origin:
+      - '*'
+      access-control-max-age:
+      - '604800'
+      alt-svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      cache-control:
+      - public, max-age=0
+      content-encoding:
+      - gzip
+      content-type:
+      - application/json; charset=utf-8
+      date:
+      - Mon, 29 Dec 2025 13:34:28 GMT
+      etag:
+      - '"MC-IjFjYTM4YzU2Y2IwN2M0YzExZjJjOTRmYjA0MjYwN2VmIg=="'
+      server:
+      - envoy
+      strict-transport-security:
+      - max-age=31536000
+      via:
+      - HTTP/2 edgeproxy, 1.1 google
+      x-content-type-options:
+      - nosniff
+      x-robots-tag:
+      - noindex, nofollow
+    status:
+      code: 200
+      message: OK
+version: 1
