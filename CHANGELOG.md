@@ -1,6 +1,19 @@
 # CHANGELOG
 
 
+## v0.1.1 (2025-12-29)
+
+### Bug Fixes
+
+- **test**: Initialize app settings with test credentials
+  ([`7f26d8c`](https://github.com/matiagimenez/spotify-rag/commit/7f26d8cecf7b6baf2fa99ef818958e0ce99fb8b1))
+
+### Chores
+
+- **config**: Adjust type ignore comment in Spotify client
+  ([`2414b94`](https://github.com/matiagimenez/spotify-rag/commit/2414b9468cbf3d81cced656ce962f775c1ef67f9))
+
+
 ## v0.1.0 (2025-12-29)
 
 ### Bug Fixes
