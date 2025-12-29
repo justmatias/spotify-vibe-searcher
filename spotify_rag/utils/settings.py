@@ -18,14 +18,27 @@ class AppSettings(BaseSettings):
     )
 
     # Spotify API Configuration
-    SPOTIFY_CLIENT_ID: str = Field(description="Spotify API Client ID")
-    SPOTIFY_CLIENT_SECRET: str = Field(description="Spotify API Client Secret")
-    SPOTIFY_REDIRECT_URI: str = Field(description="OAuth redirect URI registered")
-
-    # Spotify API Scopes
+    SPOTIFY_CLIENT_ID: str = Field(
+        description="Spotify API Client ID",
+        default="TEST_SPOTIFY_CLIENT_ID",
+    )
+    SPOTIFY_CLIENT_SECRET: str = Field(
+        description="Spotify API Client Secret",
+        default="TEST_SPOTIFY_CLIENT_SECRET",
+    )
+    SPOTIFY_REDIRECT_URI: str = Field(
+        description="OAuth redirect URI registered",
+        default="TEST_SPOTIFY_REDIRECT_URI",
+    )
     SPOTIFY_SCOPES: str = Field(
         default="user-library-read user-read-private user-read-email",
         description="Space-separated list of Spotify API scopes",
+    )
+
+    # Genius API Configuration
+    GENIUS_API_KEY: str = Field(
+        description="Genius API Key",
+        default="TEST_GENIUS_API_KEY",
     )
 
     # Application Paths
@@ -33,8 +46,6 @@ class AppSettings(BaseSettings):
         default=Path("./data"),
         description="Directory for storing application data",
     )
-
-    GENIUS_API_KEY: str = Field(description="Genius API Key")
 
     @property
     def CHROMADB_PATH(self) -> Path:
@@ -50,12 +61,7 @@ class AppSettings(BaseSettings):
 @lru_cache
 def get_settings() -> AppSettings:
     """Get cached application settings."""
-    return AppSettings(
-        SPOTIFY_CLIENT_ID="TEST_SPOTIFY_CLIENT_ID",
-        SPOTIFY_CLIENT_SECRET="TEST_SPOTIFY_CLIENT_SECRET",
-        SPOTIFY_REDIRECT_URI="TEST_SPOTIFY_REDIRECT_URI",
-        GENIUS_API_KEY="TEST_GENIUS_API_KEY",
-    )
+    return AppSettings()
 
 
 Settings = get_settings()

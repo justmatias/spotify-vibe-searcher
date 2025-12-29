@@ -48,14 +48,10 @@ class SpotifyClient(BaseModel):
             response = self.get_liked_songs(limit=limit, offset=offset)
             items = response.get("items", [])
 
-            if not items:
-                break
+            if items:
+                all_tracks.extend(SavedTrack.from_api_response(item) for item in items)
 
-            all_tracks.extend(SavedTrack.from_api_response(item) for item in items)
             offset += limit
-
-            if len(items) < limit:
-                break
 
         return all_tracks[:max_tracks]
 

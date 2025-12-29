@@ -44,6 +44,7 @@ repos:
           - spotipy==2.25.2
           - streamlit==1.52.2
           - pytest==9.0.2
+          - polyfactory==3.2.0
 
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: v1.18.2
@@ -57,3 +58,5 @@ repos:
           - python-dotenv==1.2.1
           - spotipy==2.25.2
           - streamlit==1.52.2
+          - pytest==9.0.2
+          - polyfactory==3.2.0

@@ -6,9 +6,9 @@ from tests.helpers.auth import get_spotify_token
 
 @pytest.fixture
 def spotify_client() -> SpotifyClient:
-    # Use real token from auth helper for recording, fallback to test_token for replay
+    # Use real token from auth helper for recording, fallback to mocked token for replay
     # if auth helper returns None (no cache)
-    token = get_spotify_token() or "test_token"
+    token = get_spotify_token() or "MOCKED_TOKEN"
     return SpotifyClient(access_token=token)
 
 
