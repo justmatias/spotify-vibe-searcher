@@ -1,3 +1,4 @@
+# pylint: disable=protected-access
 from unittest.mock import MagicMock
 
 import pytest
@@ -7,13 +8,11 @@ from spotify_rag.infrastructure.llm import LLMClient
 
 @pytest.fixture
 def llm_client() -> LLMClient:
-    """Fixture for LLM client instance."""
     return LLMClient()
 
 
 @pytest.fixture
 def llm_client_with_api_error() -> LLMClient:
-    """Fixture for LLM client with mocked API error."""
     llm_client = LLMClient()
 
     mock_client = MagicMock()
@@ -25,13 +24,11 @@ def llm_client_with_api_error() -> LLMClient:
 
 @pytest.fixture
 def simple_prompt() -> str:
-    """Fixture for a simple test prompt."""
     return "What is the capital of France? Answer in one word."
 
 
 @pytest.fixture
 def analysis_prompt() -> str:
-    """Fixture for a music analysis prompt."""
     return """Analyze this song in one sentence:
     - Title: Bohemian Rhapsody
     - Artist: Queen

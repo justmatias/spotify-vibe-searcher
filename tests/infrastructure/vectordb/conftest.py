@@ -1,15 +1,22 @@
 """Fixtures for VectorDB repository tests."""
 
+import pathlib
+from collections.abc import Generator
+
 import pytest
 from polyfactory.factories.pydantic_factory import ModelFactory
 
 from spotify_rag.domain import EnrichedTrack, SavedTrack
 from spotify_rag.infrastructure import VectorDBRepository
+from spotify_rag.utils import Settings
 
 
 @pytest.fixture
-def vectordb_repository() -> VectorDBRepository:
-    return VectorDBRepository()
+def vectordb_repository(tmp_path: pathlib.Path) -> Generator[VectorDBRepository]:
+    original_data_dir = Settings.DATA_DIR
+    Settings.DATA_DIR = tmp_path
+    yield VectorDBRepository()
+    Settings.DATA_DIR = original_data_dir
 
 
 @pytest.fixture

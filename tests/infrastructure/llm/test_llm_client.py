@@ -1,3 +1,4 @@
+# pylint: disable=protected-access
 import pytest
 
 from spotify_rag.infrastructure.llm import LLMClient

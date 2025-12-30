@@ -1,5 +1,4 @@
-"""Tests for VectorDB repository."""
-
+# pylint: disable=protected-access
 import pytest
 
 from spotify_rag.domain import EnrichedTrack
