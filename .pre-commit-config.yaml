@@ -17,7 +17,7 @@ repos:
       - id: gitleaks
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: 'v0.14.6'
+    rev: 'v0.14.10'
     hooks:
       - id: ruff-check
         name: ruff
@@ -30,7 +30,7 @@ repos:
         args: ['-r', '-lll']
 
   - repo: https://github.com/pylint-dev/pylint
-    rev: v4.0.3
+    rev: v4.0.4
     hooks:
       - id: pylint
         types: [python]
@@ -48,7 +48,7 @@ repos:
           - dependency-injector==4.48.3
 
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.18.2
+    rev: v1.19.1
     hooks:
       - id: mypy
         additional_dependencies:

@@ -1,6 +1,37 @@
 # CHANGELOG
 
 
+## v0.3.0 (2025-12-29)
+
+### Bug Fixes
+
+- **config**: Declare sub-containers using `providers.Container` for lazy loading.
+  ([`a8b9cea`](https://github.com/matiagimenez/spotify-rag/commit/a8b9ceaa9df72902b47dae733981c4120c52119c))
+
+- **test**: Implement tests for the LibrarySyncService and dependency injection container
+  ([`1bf5272`](https://github.com/matiagimenez/spotify-rag/commit/1bf527294aede4f9662f22370490e61d30424ac8))
+
+### Chores
+
+- **config**: Remove docstring from `injections` container.
+  ([`46bec22`](https://github.com/matiagimenez/spotify-rag/commit/46bec22eb5ef02c0d556cdee5787036f84c7972b))
+
+- **config**: Update requirements.txt
+  ([`baa41a2`](https://github.com/matiagimenez/spotify-rag/commit/baa41a2ea258fc8f4e1bfc6f31f20a71ab1c0cc6))
+
+### Features
+
+- **config**: Implement library synchronization with track enrichment and dependency injection for
+  services and infrastructure
+  ([`7172b12`](https://github.com/matiagimenez/spotify-rag/commit/7172b129b00994eacf1eb036db5261828be75e65))
+
+### Refactoring
+
+- **config**: Update DI container instantiation to directly create sub-containers and pass
+  dependencies.
+  ([`aaffc00`](https://github.com/matiagimenez/spotify-rag/commit/aaffc001b6e0162fc6a1e8f4448ecf6a3da69eb1))
+
+
 ## v0.2.0 (2025-12-29)
 
 ### Chores
