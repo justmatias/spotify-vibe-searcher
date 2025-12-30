@@ -57,7 +57,5 @@ class GeniusClient(BaseModel):
             if song and song.lyrics:
                 lyrics = song.lyrics
                 log(f"Found lyrics for: {clean_title} - {artist}", LogLevel.INFO)
-            else:
-                log(f"No lyrics found for: {title} - {artist}", LogLevel.WARNING)
 
         return lyrics
