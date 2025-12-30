@@ -1,0 +1,58 @@
+interactions:
+- request:
+    body: '{"messages":[{"role":"user","content":"Say hello"}],"model":"llama3.2:3b","temperature":0.7}'
+    headers:
+      Accept:
+      - application/json
+      Accept-Encoding:
+      - gzip, deflate
+      Authorization:
+      - Bearer ollama
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '92'
+      Content-Type:
+      - application/json
+      Host:
+      - localhost:11434
+      User-Agent:
+      - OpenAI/Python 2.14.0
+      X-Stainless-Arch:
+      - x64
+      X-Stainless-Async:
+      - 'false'
+      X-Stainless-Lang:
+      - python
+      X-Stainless-OS:
+      - Linux
+      X-Stainless-Package-Version:
+      - 2.14.0
+      X-Stainless-Runtime:
+      - CPython
+      X-Stainless-Runtime-Version:
+      - 3.12.10
+      x-stainless-read-timeout:
+      - '600'
+      x-stainless-retry-count:
+      - '0'
+    method: POST
+    uri: http://localhost:11434/v1/chat/completions
+  response:
+    body:
+      string: '{"id":"chatcmpl-113","object":"chat.completion","created":1767096213,"model":"llama3.2:3b","system_fingerprint":"fp_ollama","choices":[{"index":0,"message":{"role":"assistant","content":"Hello!
+        It''s nice to meet you. Is there something I can help you with or would you
+        like to chat?"},"finish_reason":"stop"}],"usage":{"prompt_tokens":27,"completion_tokens":25,"total_tokens":52}}
+
+        '
+    headers:
+      Content-Length:
+      - '381'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 30 Dec 2025 12:03:33 GMT
+    status:
+      code: 200
+      message: OK
+version: 1

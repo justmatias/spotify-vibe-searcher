@@ -58,7 +58,7 @@ class AppSettings(BaseSettings):
     )
 
     LLM_BASE_URL: str = Field(
-        default="http://localhost:11434",
+        default="http://localhost:11434/v1",
         description="LLM API base URL",
     )
 
