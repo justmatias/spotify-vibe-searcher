@@ -135,3 +135,23 @@ Since Genius is slow, the UI is critical.
 4. **Chat:** User asks _"Which songs talk about making a mistake?"_.
 5. **Result:** App returns specific songs based on lyrical content, not just the title.
 ```
+
+## 🚀 Future Potential Features
+
+### Short Term (Usability)
+
+- [ ] **Playlist Creation**: One-click "Create Playlist" from search results directly to Spotify.
+- [ ] **Filters**: Add explicit filters for Genre, Year, or BPM range to narrow down semantic search.
+- [ ] **Audio Preview**: Embedded Spotify web player widget to preview tracks instantly.
+
+### Medium Term (Performance & Scale)
+
+- [ ] **Async Batching**: optimize LLM inference by batching requests or running parallel processing for larger libraries.
+- [x] **Caching Strategy**: Implement a more aggressive caching layer for Genius lyrics to reduce API hits on re-syncs.
+- [x] **Incremental Sync**: Only analyze _newly added_ tracks instead of re-scanning the last N tracks every time.
+
+### Long Term (AI & Experience)
+
+- [ ] **Personalized Vibe Models**: Fine-tune a small LoRA adapter on the user's specific taste descriptions.
+- [ ] **Voice Search**: "Hey, play me something for a rainy Sunday."
+- [ ] **Multi-Modal Input**: Upload a photo (e.g., a sunset) and get songs that match the visual vibe (using LLaVA or similar vision models).

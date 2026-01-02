@@ -1,3 +1,5 @@
+import pathlib
+from collections.abc import Generator
 from unittest.mock import MagicMock
 
 import pytest
@@ -9,23 +11,39 @@ from spotify_rag.domain import (
     SpotifyAlbum,
     SpotifyArtist,
     SpotifyTrack,
-    SyncProgress,
 )
 from spotify_rag.infrastructure import GeniusClient, SpotifyClient, VectorDBRepository
 from spotify_rag.injections import container
 from spotify_rag.services import LibrarySyncService, TrackAnalysisService
+from spotify_rag.utils import Settings
 
 
 @pytest.fixture
-def sync_progress_sample(
-    sync_progress_factory: ModelFactory[SyncProgress],
-) -> SyncProgress:
-    return sync_progress_factory.build(
-        current=1,
-        total=10,
-        song_title="Test Song",
-        artist_name="Test Artist",
+def track_analysis_service() -> TrackAnalysisService:
+    return container.services.track_analysis_service()
+
+
+@pytest.fixture
+def vectordb_repository(tmp_path: pathlib.Path) -> Generator[VectorDBRepository]:
+    original_data_dir = Settings.DATA_DIR
+    Settings.DATA_DIR = tmp_path
+    yield VectorDBRepository()
+    Settings.DATA_DIR = original_data_dir
+
+
+@pytest.fixture
+def _populate_tracks(
+    vectordb_repository: VectorDBRepository,
+    realistic_liked_songs: list[SavedTrack],
+    enriched_track_factory: ModelFactory[EnrichedTrack],
+) -> None:
+    saved_track = realistic_liked_songs[1]  # Stairway to Heaven
+    enriched_track = enriched_track_factory.build(
+        track=saved_track,
+        vibe_description="Existing vibe description",
+        has_lyrics=True,
     )
+    vectordb_repository.add_track(enriched_track)
 
 
 @pytest.fixture
@@ -125,36 +143,13 @@ def mock_spotify_client(
 
 
 @pytest.fixture
-def mock_genius_client() -> MagicMock:
-    client = MagicMock(spec=GeniusClient)
-    client.search_song.side_effect = [
-        "First song lyrics",
-        "Second song lyrics",
-        "",
-    ]
-    return client
-
-
-@pytest.fixture
-def track_analysis_service() -> TrackAnalysisService:
-    return container.services.track_analysis_service()  # type: ignore[no-any-return]
-
-
-@pytest.fixture
-def vectordb_repository() -> VectorDBRepository:
-    return container.infrastructure.vectordb_repository()  # type: ignore[no-any-return]
-
-
-@pytest.fixture
 def library_sync_service(
     mock_spotify_client: MagicMock,
-    mock_genius_client: MagicMock,
-    track_analysis_service: TrackAnalysisService,
     vectordb_repository: VectorDBRepository,
 ) -> LibrarySyncService:
     return LibrarySyncService(
         spotify_client=mock_spotify_client,
-        genius_client=mock_genius_client,
-        track_analysis_service=track_analysis_service,
+        genius_client=container.infrastructure.genius_client(),
+        track_analysis_service=container.services.track_analysis_service(),
         vectordb_repository=vectordb_repository,
     )

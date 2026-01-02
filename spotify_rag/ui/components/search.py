@@ -59,7 +59,7 @@ def _render_search_results(results: SearchResults) -> None:
 
     for idx, result in enumerate(results.results, start=1):
         with st.container():
-            col1, col2 = st.columns([4, 1])
+            col1, col2 = st.columns([3, 1])
 
             with col1:
                 st.markdown(f"**{idx}. {result.track_name}**")
@@ -74,7 +74,11 @@ def _render_search_results(results: SearchResults) -> None:
             with st.expander("📊 Track Details"):
                 col_a, col_b, col_c = st.columns(3)
                 with col_a:
-                    st.metric("Popularity", f"{result.popularity}/100")
+                    st.metric(
+                        "Popularity",
+                        f"{result.popularity}/100",
+                        help="Score out of 100",
+                    )
                 with col_b:
                     st.caption(f"**Genres:** {result.genres or 'N/A'}")
                 with col_c:

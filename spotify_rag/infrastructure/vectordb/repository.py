@@ -75,6 +75,10 @@ class VectorDBRepository(BaseModel):
         log(f"Deleting {len(track_ids)} tracks from VectorDB...", LogLevel.INFO)
         self.collection.delete(ids=track_ids)
 
+    def track_exists(self, track_id: str) -> bool:
+        result = self.collection.get(ids=[track_id])
+        return len(result["ids"]) > 0
+
     def search_by_vibe(self, query: str, n_results: int = 10) -> dict[str, list]:
         """Search for tracks by vibe description using semantic similarity.
 

@@ -137,3 +137,15 @@ def test_search_by_vibe_returns_metadata(
         assert "track_name" in metadata
         assert "artist_names" in metadata
         assert "album_name" in metadata
+
+
+@pytest.mark.vcr
+def test_track_exists(
+    vectordb_repository: VectorDBRepository,
+    enriched_track_with_vibe: EnrichedTrack,
+) -> None:
+    assert not vectordb_repository.track_exists(enriched_track_with_vibe.track_id)
+
+    vectordb_repository.add_track(enriched_track_with_vibe)
+
+    assert vectordb_repository.track_exists(enriched_track_with_vibe.track_id)

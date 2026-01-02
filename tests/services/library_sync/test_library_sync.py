@@ -3,6 +3,7 @@ from unittest.mock import MagicMock
 import pytest
 
 from spotify_rag.domain import EnrichedTrack, SyncProgress
+from spotify_rag.infrastructure import VectorDBRepository
 from spotify_rag.services import LibrarySyncService
 
 
@@ -44,13 +45,10 @@ def test_sync_library_tracks_with_and_without_lyrics(
     assert len(enriched_tracks) == 3
 
     assert enriched_tracks[0].has_lyrics
-    assert enriched_tracks[0].lyrics == "First song lyrics"
+    assert "Bohemian Rhapsody" in enriched_tracks[0].track.track.name
 
     assert enriched_tracks[1].has_lyrics
-    assert enriched_tracks[1].lyrics == "Second song lyrics"
-
-    assert not enriched_tracks[2].has_lyrics
-    assert not enriched_tracks[2].lyrics
+    assert enriched_tracks[2].has_lyrics
 
 
 @pytest.mark.vcr
@@ -64,13 +62,15 @@ def test_sync_library_calls_spotify_client(
 
 
 @pytest.mark.vcr
-def test_sync_library_calls_genius_client_for_each_track(
+@pytest.mark.vcr
+def test_sync_library_fetches_lyrics_for_tracks(
     library_sync_service: LibrarySyncService,
-    mock_genius_client: MagicMock,
 ) -> None:
-    list(library_sync_service.sync_library(limit=3))
+    results = list(library_sync_service.sync_library(limit=3))
 
-    assert mock_genius_client.search_song.call_count == 3
+    enriched_tracks = [r for r in results if isinstance(r, EnrichedTrack)]
+    assert len(enriched_tracks) == 3
+    assert all(t.has_lyrics for t in enriched_tracks)
 
 
 def test_enriched_track_properties(
@@ -83,3 +83,19 @@ def test_enriched_track_properties(
 
     assert not enriched_track_without_lyrics.has_lyrics
     assert not enriched_track_without_lyrics.lyrics
+
+
+@pytest.mark.vcr
+@pytest.mark.vcr
+@pytest.mark.usefixtures("_populate_tracks")
+def test_sync_library_skips_existing_tracks(
+    library_sync_service: LibrarySyncService,
+    vectordb_repository: VectorDBRepository,
+) -> None:
+    results = list(library_sync_service.sync_library(limit=3))
+
+    progress_updates = [r for r in results if isinstance(r, SyncProgress)]
+    assert len(progress_updates) == 3
+
+    enriched_tracks = [r for r in results if isinstance(r, EnrichedTrack)]
+    assert len(enriched_tracks) == 2

@@ -49,6 +49,13 @@ class LibrarySyncService(BaseModel):
                 artist_name=artist_name,
             )
 
+            if self.vectordb_repository.track_exists(track.id_):
+                log(
+                    f"Skipping '{song_title}' - already indexed.",
+                    LogLevel.INFO,
+                )
+                continue
+
             enriched_track = self.enrich_track(saved_track)
             if enriched_track.vibe_description:
                 self.vectordb_repository.add_track(enriched_track)
