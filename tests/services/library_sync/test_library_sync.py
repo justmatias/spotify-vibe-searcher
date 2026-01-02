@@ -1,11 +1,12 @@
-"""Tests for LibrarySyncService."""
-
 from unittest.mock import MagicMock
+
+import pytest
 
 from spotify_rag.domain import EnrichedTrack, SyncProgress
 from spotify_rag.services import LibrarySyncService
 
 
+@pytest.mark.vcr
 def test_sync_library_yields_progress_and_tracks(
     library_sync_service: LibrarySyncService,
 ) -> None:
@@ -15,6 +16,7 @@ def test_sync_library_yields_progress_and_tracks(
     assert isinstance(results[1], EnrichedTrack)
 
 
+@pytest.mark.vcr
 def test_sync_library_progress_increments(
     library_sync_service: LibrarySyncService,
 ) -> None:
@@ -29,6 +31,7 @@ def test_sync_library_progress_increments(
     assert all(p.total == 3 for p in progress_updates)
 
 
+@pytest.mark.vcr
 def test_sync_library_tracks_with_and_without_lyrics(
     library_sync_service: LibrarySyncService,
 ) -> None:
@@ -50,6 +53,7 @@ def test_sync_library_tracks_with_and_without_lyrics(
     assert not enriched_tracks[2].lyrics
 
 
+@pytest.mark.vcr
 def test_sync_library_calls_spotify_client(
     library_sync_service: LibrarySyncService,
     mock_spotify_client: MagicMock,
@@ -59,6 +63,7 @@ def test_sync_library_calls_spotify_client(
     mock_spotify_client.get_all_liked_songs.assert_called_once_with(max_tracks=5)
 
 
+@pytest.mark.vcr
 def test_sync_library_calls_genius_client_for_each_track(
     library_sync_service: LibrarySyncService,
     mock_genius_client: MagicMock,

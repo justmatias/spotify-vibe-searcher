@@ -24,6 +24,10 @@ class SpotifyArtist(BaseModel):
     def from_api_response(cls, data: dict[str, Any]) -> Self:
         return cls(**data)
 
+    @property
+    def genre_names(self) -> str:
+        return ", ".join(genre for genre in self.genres)
+
 
 class SpotifyAlbum(BaseModel):
     id_: str = Field(alias="id")
@@ -69,3 +73,7 @@ class SavedTrack(BaseModel):
     @classmethod
     def from_api_response(cls, data: dict[str, Any]) -> Self:
         return cls(**data)
+
+    @property
+    def track_id(self) -> str:
+        return self.track.id_

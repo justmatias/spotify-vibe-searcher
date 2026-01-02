@@ -1,5 +1,3 @@
-"""Library sync component for Streamlit UI."""
-
 import streamlit as st
 
 from spotify_rag.domain import EnrichedTrack, SyncProgress
@@ -61,18 +59,34 @@ def _render_sync_summary(
     """
     with container:
         st.markdown("### 📊 Sync Summary")
+
+        col1, col2 = st.columns(2)
         tracks_with_lyrics = sum(1 for t in enriched_tracks if t.has_lyrics)
-        st.metric(
-            "Tracks with Lyrics",
-            f"{tracks_with_lyrics}/{len(enriched_tracks)}",
-        )
+        tracks_with_vibes = sum(1 for t in enriched_tracks if t.vibe_description)
+
+        with col1:
+            st.metric(
+                "Tracks with Lyrics",
+                f"{tracks_with_lyrics}/{len(enriched_tracks)}",
+            )
+        with col2:
+            st.metric(
+                "Tracks with Vibe Analysis",
+                f"{tracks_with_vibes}/{len(enriched_tracks)}",
+            )
 
         # Show sample tracks
-        with st.expander("🎵 View Synced Tracks"):
-            for enriched in enriched_tracks[:5]:
+        with st.expander("🎵 View Synced Tracks", expanded=True):
+            for enriched in enriched_tracks[:10]:
                 track = enriched.track.track
                 st.markdown(f"**{track.name}** - {track.artist_names}")
+
                 if enriched.has_lyrics:
                     st.caption(f"✅ Lyrics found ({len(enriched.lyrics)} chars)")
                 else:
                     st.caption("❌ No lyrics found")
+
+                if enriched.vibe_description:
+                    st.info(f"🎭 **Vibe:** {enriched.vibe_description}")
+
+                st.markdown("---")

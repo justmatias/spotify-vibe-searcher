@@ -1,35 +1,12 @@
 import pytest
 from polyfactory.factories.pydantic_factory import ModelFactory
-from polyfactory.pytest_plugin import register_fixture
 
 from spotify_rag.domain.track import (
-    SavedTrack,
     SpotifyAlbum,
     SpotifyArtist,
     SpotifyImage,
     SpotifyTrack,
 )
-
-
-@register_fixture(name="spotify_image_factory")
-class SpotifyImageFactory(ModelFactory[SpotifyImage]): ...
-
-
-@register_fixture(name="spotify_artist_factory")
-class SpotifyArtistFactory(ModelFactory[SpotifyArtist]): ...
-
-
-@register_fixture(name="spotify_album_factory")
-class SpotifyAlbumFactory(ModelFactory[SpotifyAlbum]): ...
-
-
-@register_fixture(name="spotify_track_factory")
-class SpotifyTrackFactory(ModelFactory[SpotifyTrack]):
-    __random_seed__ = 123
-
-
-@register_fixture(name="saved_track_factory")
-class SavedTrackFactory(ModelFactory[SavedTrack]): ...
 
 
 @pytest.fixture

@@ -20,6 +20,9 @@ dependencies = [
     "pydantic>=2.12.4",
     "pydantic-settings>=2.12",
     "dependency-injector>=4.48.3",
+    "chromadb>=1.4.0",
+    "openai>=2.14.0",
+    "ollama>=0.6.1",
 ]
 
 
@@ -88,6 +91,8 @@ disable = [
   "astroid-error",
   "consider-using-assignment-expr",
   "redefined-outer-name",
+  "broad-exception-caught",
+  "import-error",
 ]
 extension-pkg-allow-list = ["dependency_injector"]
 generated-members = ["dependency_injector.*"]

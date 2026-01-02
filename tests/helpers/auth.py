@@ -14,5 +14,5 @@ def get_spotify_token() -> str | None:
             return None
         token_info = auth_manager.oauth.validate_token(token_info)
         return token_info.get("access_token")  # type: ignore[no-any-return]
-    except Exception:  # pylint: disable=broad-exception-caught
+    except Exception:
         return None

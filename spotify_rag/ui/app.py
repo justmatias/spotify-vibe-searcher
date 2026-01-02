@@ -15,6 +15,7 @@ from .components import (
     render_footer,
     render_hero_section,
     render_login_button,
+    render_search_section,
     render_sidebar,
     render_sync_library_section,
     render_user_profile,
@@ -93,8 +94,7 @@ def render_authenticated_view(user: SpotifyUser) -> None:
             )
 
         with col_b:
-            if st.button("🔍 Search Vibes", use_container_width=True):
-                st.info("🎵 Semantic search coming soon!")
+            render_search_section()
 
         st.markdown("---")
 
@@ -131,7 +131,7 @@ def app() -> None:
         # Ensure cache directory exists
         Settings.CACHE_PATH.mkdir(parents=True, exist_ok=True)
 
-    except Exception as e:  # pylint: disable=broad-exception-caught
+    except Exception as e:
         render_sidebar()
         render_hero_section()
         st.error(f"⚠️ Configuration Error: {str(e)}")

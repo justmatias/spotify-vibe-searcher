@@ -1,0 +1,74 @@
+interactions:
+- request:
+    body: '{"messages":[{"role":"user","content":"\n        Act as an expert music
+      critic. Analyze this song:\n            - **Title:** ehPbVDnRNrPkFBQquOAJ\n            -
+      **Artist:** eGaslBLVHZYGmzjZxNch\n            - **Album:** RjDtVgnQqXcufDYqHnwD\n            -
+      **Musical Genres:** q, r, B, W, Q, B, O, z, L, O, n, R, E, z, u, l, A, g, H,
+      U\n            - **Popularity:** 7048/100\n            - **Lyrics Snippet:**
+      \"Test lyrics about love and loss\"\n\n            **Task:**\n            1.
+      Detect the core theme of the lyrics (love, protest, grief, party, nostalgia,
+      etc.)\n            2. Analyze the emotional tone and mood of the lyrics\n            3.
+      Consider how the genre and artist style might contrast or align with the lyrical
+      content\n            4. Generate a synthetic **Vibe Description** for semantic
+      search purposes\n\n            **Output:** Only the descriptive sentence (max
+      2-3 sentences). Focus on the emotional essence and searchable characteristics.\n\n            **Example:**
+      \"An indie folk track with melancholic lyrics about lost love and regret, delivered
+      through poetic storytelling that evokes deep nostalgia and bittersweet reflection.\"\n\n            Vibe
+      Description:\n        "}],"model":"llama3.2:3b","temperature":0.7}'
+    headers:
+      Accept:
+      - application/json
+      Accept-Encoding:
+      - gzip, deflate
+      Authorization:
+      - Bearer MOCKED_TOKEN
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '1252'
+      Content-Type:
+      - application/json
+      Host:
+      - localhost:11434
+      User-Agent:
+      - OpenAI/Python 2.14.0
+      X-Stainless-Arch:
+      - x64
+      X-Stainless-Async:
+      - 'false'
+      X-Stainless-Lang:
+      - python
+      X-Stainless-OS:
+      - Linux
+      X-Stainless-Package-Version:
+      - 2.14.0
+      X-Stainless-Runtime:
+      - CPython
+      X-Stainless-Runtime-Version:
+      - 3.12.10
+      x-stainless-read-timeout:
+      - '600'
+      x-stainless-retry-count:
+      - '0'
+    method: POST
+    uri: http://localhost:11434/v1/chat/completions
+  response:
+    body:
+      string: '{"id":"chatcmpl-515","object":"chat.completion","created":1767363028,"model":"llama3.2:3b","system_fingerprint":"fp_ollama","choices":[{"index":0,"message":{"role":"assistant","content":"I
+        can''t provide a Vibe Description for a song with the given title and artist,
+        as it appears to be a random combination of characters. \n\nHowever, if you
+        provide the actual song lyrics, I''d be happy to help analyze them according
+        to your requirements."},"finish_reason":"stop"}],"usage":{"prompt_tokens":321,"completion_tokens":54,"total_tokens":375}}
+
+        '
+    headers:
+      Content-Length:
+      - '540'
+      Content-Type:
+      - application/json
+      Date:
+      - Fri, 02 Jan 2026 14:10:28 GMT
+    status:
+      code: 200
+      message: OK
+version: 1

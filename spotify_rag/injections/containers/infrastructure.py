@@ -2,17 +2,28 @@
 
 from dependency_injector import containers, providers
 
-from spotify_rag.infrastructure import GeniusClient, SpotifyClient
+from spotify_rag.infrastructure import (
+    GeniusClient,
+    LLMClient,
+    SpotifyAuthManager,
+    SpotifyClient,
+    VectorDBRepository,
+)
 
 
 class InfrastructureContainer(containers.DeclarativeContainer):
+    """Container for infrastructure layer dependencies."""
+
     config = providers.Configuration()
 
-    # Spotify Client - Factory (new instance per request with access token)
+    # Factories(one instance per user)
     spotify_client = providers.Factory(
         SpotifyClient,
         access_token=config.spotify.access_token,
     )
 
-    # Genius Client - Singleton (shared instance, no auth needed)
+    # Singletons
+    spotify_auth_manager = providers.Singleton(SpotifyAuthManager)
     genius_client = providers.Singleton(GeniusClient)
+    llm_client = providers.Singleton(LLMClient)
+    vectordb_repository = providers.Singleton(VectorDBRepository)

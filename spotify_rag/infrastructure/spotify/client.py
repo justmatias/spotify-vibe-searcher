@@ -7,6 +7,7 @@ from spotipy import Spotify
 
 from spotify_rag.domain import SavedTrack, SpotifyUser
 from spotify_rag.domain.track import SpotifyArtist
+from spotify_rag.utils.logger import LogLevel, log
 
 
 class SpotifyClient(BaseModel):
@@ -40,6 +41,8 @@ class SpotifyClient(BaseModel):
         Returns:
             List of all saved track items.
         """
+        log(f"Fetching up to {max_tracks} liked songs from Spotify...", LogLevel.INFO)
+
         all_tracks: list[SavedTrack] = []
         offset = 0
         limit = 50
@@ -53,6 +56,8 @@ class SpotifyClient(BaseModel):
 
             offset += limit
 
+        total_fetched = len(all_tracks[:max_tracks])
+        log(f"Successfully fetched {total_fetched} liked songs.", LogLevel.INFO)
         return all_tracks[:max_tracks]
 
     def get_artists(self, artist_ids: list[str]) -> list[SpotifyArtist]:
@@ -69,6 +74,7 @@ class SpotifyClient(BaseModel):
 
         # Deduplicate IDs to save calls
         unique_ids = sorted(set(artist_ids))
+        log(f"Fetching details for {len(unique_ids)} unique artists...", LogLevel.INFO)
 
         for i in range(0, len(unique_ids), batch_size):
             batch = unique_ids[i : i + batch_size]
@@ -78,4 +84,5 @@ class SpotifyClient(BaseModel):
                     if artist:
                         all_artists.append(SpotifyArtist.from_api_response(artist))
 
+        log(f"Retrieved details for {len(all_artists)} artists.", LogLevel.INFO)
         return all_artists

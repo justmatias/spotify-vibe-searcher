@@ -7,6 +7,7 @@ from loguru._logger import Logger
 
 
 class LogLevel(Enum):
+    DEBUG = "DEBUG"
     INFO = "INFO"
     WARNING = "WARNING"
     ERROR = "ERROR"
@@ -24,6 +25,6 @@ def get_logger() -> Logger:
     return logger  # type: ignore[return-value]
 
 
-def log(message: str, log_level: LogLevel = LogLevel.INFO) -> None:
+def log(message: str, level: LogLevel = LogLevel.INFO) -> None:
     logger_ = get_logger()
-    logger_.log(log_level.value, message)
+    logger_.log(level.value, message)

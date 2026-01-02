@@ -1,12 +1,10 @@
-"""Genius API client wrapper using lyricsgenius."""
-
 import contextlib
 import re
 
 from lyricsgenius import Genius
 from pydantic import BaseModel
 
-from spotify_rag.utils import Settings
+from spotify_rag.utils import LogLevel, Settings, log
 
 
 class GeniusClient(BaseModel):
@@ -49,8 +47,15 @@ class GeniusClient(BaseModel):
     def search_song(self, title: str, artist: str) -> str:
         clean_title = self._sanitize_title(title)
         lyrics = ""
+        log(
+            f"Searching lyrics for: '{clean_title}' by '{artist}' (Original title: '{title}')",
+            LogLevel.DEBUG,
+        )
+
         with contextlib.suppress(Exception):
             song = self.client.search_song(clean_title, artist)
             if song and song.lyrics:
                 lyrics = song.lyrics
+                log(f"Found lyrics for: {clean_title} - {artist}", LogLevel.INFO)
+
         return lyrics
