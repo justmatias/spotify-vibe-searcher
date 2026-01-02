@@ -1,8 +1,11 @@
+# pylint: disable=line-too-long, duplicate-code
 import pathlib
 from collections.abc import Generator
 
 import pytest
+from polyfactory.factories.pydantic_factory import ModelFactory
 
+from spotify_rag.domain import EnrichedTrack, SavedTrack
 from spotify_rag.infrastructure import VectorDBRepository
 from spotify_rag.services import SearchService
 from spotify_rag.utils import Settings
@@ -29,9 +32,6 @@ def sample_query() -> str:
 
 @pytest.fixture
 def _populate_search_tracks(vectordb_repository: VectorDBRepository) -> None:
-    from polyfactory.factories.pydantic_factory import ModelFactory
-
-    from spotify_rag.domain import EnrichedTrack, SavedTrack
 
     enriched_track_factory = ModelFactory.create_factory(EnrichedTrack)
     saved_track_factory = ModelFactory.create_factory(SavedTrack)
@@ -39,13 +39,13 @@ def _populate_search_tracks(vectordb_repository: VectorDBRepository) -> None:
     tracks = [
         enriched_track_factory.build(
             track=saved_track_factory.build(),
-            vibe_description="A melancholic indie track with introspective lyrics about lost love and regret",
-            lyrics="Sample lyrics about heartbreak",
+            vibe_description="An upbeat pop song with catchy hooks and positive energy perfect for dancing",
+            lyrics="Sample lyrics about happiness",
         ),
         enriched_track_factory.build(
             track=saved_track_factory.build(),
-            vibe_description="An upbeat pop song with catchy hooks and positive energy perfect for dancing",
-            lyrics="Sample lyrics about happiness",
+            vibe_description="A melancholic indie track with introspective lyrics about lost love and regret",
+            lyrics="Sample lyrics about heartbreak",
         ),
         enriched_track_factory.build(
             track=saved_track_factory.build(),

@@ -95,4 +95,4 @@ class VectorDBRepository(BaseModel):
             n_results=n_results,
         )
         log(f"Found {len(results['ids'][0])} matching tracks", LogLevel.INFO)
-        return results
+        return results  # type: ignore[no-any-return]

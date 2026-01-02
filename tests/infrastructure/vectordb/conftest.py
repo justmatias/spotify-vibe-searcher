@@ -1,5 +1,4 @@
-"""Fixtures for VectorDB repository tests."""
-
+# pylint: disable=line-too-long
 import pathlib
 from collections.abc import Generator
 

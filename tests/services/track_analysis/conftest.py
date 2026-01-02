@@ -1,3 +1,4 @@
+from collections.abc import Generator
 from unittest.mock import patch
 
 import pytest
@@ -38,7 +39,9 @@ def simple_lyrics() -> str:
     ],
     ids=["RuntimeError", "ValueError", "ConnectionError"],
 )
-def mock_llm_exception(request: pytest.FixtureRequest):
+def mock_llm_exception(
+    request: pytest.FixtureRequest,
+) -> Generator[tuple[type[Exception], str], None, None]:
     """Fixture that mocks LLM client to raise various exceptions."""
     exception_class, error_message = request.param
     with patch(
