@@ -100,3 +100,10 @@ class VectorDBRepository(BaseModel):
         )
         log(f"Found {len(results['ids'][0])} matching tracks", LogLevel.INFO)
         return results  # type: ignore[no-any-return]
+
+    def get_all_tracks(self) -> dict[str, list]:
+        log("Retrieving all tracks from VectorDB...", LogLevel.INFO)
+        return self.collection.get()  # type: ignore[no-any-return]
+
+    def count_tracks(self) -> int:
+        return int(self.collection.count())

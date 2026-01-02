@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "spotify-rag"
 version = "0.0.1"
-description = "Spotify RAG is an AI system that converts raw blockchain transactions into clear, human-readable explanations"
+description = "Spotify Vibe Searcher is an AI system that converts raw blockchain transactions into clear, human-readable explanations"
 readme = "README.md"
 license = { text = "MIT" }
 

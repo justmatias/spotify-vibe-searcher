@@ -5,7 +5,7 @@ from spotify_rag.injections import container
 
 
 def render_search_section() -> None:
-    if st.button("🔍 Search Vibes", use_container_width=True):
+    if st.button("🔍 Search Vibes", width="stretch"):
         st.session_state.show_search = True
 
     if st.session_state.get("show_search", False):
@@ -21,7 +21,7 @@ def render_search_section() -> None:
             key="vibe_query",
         )
 
-        search_button = st.button("Search", type="primary", use_container_width=True)
+        search_button = st.button("Search", type="primary", width="stretch")
 
         n_results = st.slider(
             "Number of results",
@@ -86,7 +86,7 @@ def _render_search_results(results: SearchResults) -> None:
                         st.link_button(
                             "🎵 Open in Spotify",
                             result.spotify_url,
-                            use_container_width=True,
+                            width="stretch",
                         )
 
             st.markdown("---")

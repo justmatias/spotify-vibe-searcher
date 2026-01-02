@@ -1,5 +1,3 @@
-"""Domain models for Spotify RAG."""
-
 from .search import SearchResult, SearchResults
 from .sync import EnrichedTrack, SyncProgress
 from .track import SavedTrack, SpotifyAlbum, SpotifyArtist, SpotifyImage, SpotifyTrack

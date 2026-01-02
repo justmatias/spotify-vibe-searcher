@@ -4,7 +4,7 @@ import streamlit as st
 def render_sidebar() -> None:
     """Render the sidebar content."""
     with st.sidebar:
-        st.markdown("### 🎵 Spotify RAG")
+        st.markdown("### 🎵 Spotify Vibe Searcher")
         st.markdown("---")
 
         st.markdown("#### How it works")

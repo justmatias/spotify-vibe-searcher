@@ -11,7 +11,7 @@ def render_sync_library_section(access_token: str, track_limit: int) -> None:
         access_token: Spotify access token for authentication.
         track_limit: Maximum number of tracks to sync.
     """
-    if st.button("📥 Sync Library", use_container_width=True):
+    if st.button("📥 Sync Library", width="stretch"):
         # Configure container with access token
         container.infrastructure.config.spotify.access_token.from_value(access_token)
 

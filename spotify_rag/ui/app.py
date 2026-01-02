@@ -14,6 +14,7 @@ from .components import (
     render_features,
     render_footer,
     render_hero_section,
+    render_library_section,
     render_login_button,
     render_search_section,
     render_sidebar,
@@ -98,7 +99,11 @@ def render_authenticated_view(user: SpotifyUser) -> None:
 
         st.markdown("---")
 
-        if st.button("🚪 Disconnect", use_container_width=True):
+        render_library_section()
+
+        st.markdown("---")
+
+        if st.button("🚪 Disconnect", width="stretch"):
             # Clear session and cached token
             st.session_state.authenticated = False
             st.session_state.access_token = None

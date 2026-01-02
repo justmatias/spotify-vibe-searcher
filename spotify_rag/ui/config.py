@@ -8,7 +8,7 @@ CSS_FILE = Path(__file__).parent / "styles" / "styles.css"
 def configure_page() -> None:
     """Configure the Streamlit page settings."""
     st.set_page_config(
-        page_title="Spotify RAG",
+        page_title="Spotify Vibe Searcher",
         page_icon="🎵",
         layout="wide",
         initial_sidebar_state="expanded",

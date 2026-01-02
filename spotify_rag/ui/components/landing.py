@@ -6,7 +6,7 @@ def render_hero_section() -> None:
     st.markdown(
         """
         <div class="hero-section">
-            <h1 class="hero-title">🎵 Spotify RAG</h1>
+            <h1 class="hero-title">🎵 Spotify Vibe Searcher</h1>
             <p class="hero-subtitle">
                 Discover music by mood, not just metadata.
             </p>

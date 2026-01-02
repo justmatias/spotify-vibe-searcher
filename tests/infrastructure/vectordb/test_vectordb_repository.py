@@ -140,6 +140,31 @@ def test_search_by_vibe_returns_metadata(
 
 
 @pytest.mark.vcr
+@pytest.mark.usefixtures("_populate_with_batch")
+def test_get_all_tracks(
+    vectordb_repository: VectorDBRepository,
+) -> None:
+    results = vectordb_repository.get_all_tracks()
+    assert len(results["ids"]) > 0
+
+
+@pytest.mark.vcr
+@pytest.mark.usefixtures("_populate_with_batch")
+def test_count_tracks(
+    vectordb_repository: VectorDBRepository,
+) -> None:
+    count = vectordb_repository.count_tracks()
+    assert count > 0
+
+
+def test_count_tracks_empty(
+    vectordb_repository: VectorDBRepository,
+) -> None:
+    count = vectordb_repository.count_tracks()
+    assert count == 0
+
+
+@pytest.mark.vcr
 def test_track_exists(
     vectordb_repository: VectorDBRepository,
     enriched_track_with_vibe: EnrichedTrack,
