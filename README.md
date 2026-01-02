@@ -1,71 +1,180 @@
-# 🎵 Spotify Semantic Vibe Searcher (RAG)
+# 🎵 Spotify Semantic Vibe Searcher
 
 ![Python](https://img.shields.io/badge/Python-3.12%2B-blue)
+![Streamlit](https://img.shields.io/badge/UI-Streamlit-FF4B4B)
 ![Ollama](https://img.shields.io/badge/AI-Ollama-orange)
-![LangChain](https://img.shields.io/badge/RAG-LangChain-green)
+![ChromaDB](https://img.shields.io/badge/Vector-ChromaDB-green)
 ![Spotify API](https://img.shields.io/badge/Data-Spotify-1DB954)
 ![Genius](https://img.shields.io/badge/Lyrics-Genius-FFFF00)
 
-> **Stop searching by Genre. Start searching by _Vibe_ and _Meaning_.** > **Now 100% Local & Private.**
+> **Stop searching by Genre. Start searching by _Vibe_ and _Meaning_.** > **100% Local & Private.**
 
-This project is a **Retrieval-Augmented Generation (RAG)** application that allows you to search your personal Spotify "Liked Songs" library using natural language abstract descriptions.
+A **Retrieval-Augmented Generation (RAG)** application that lets you search your Spotify "Liked Songs" library using natural language descriptions of vibes and emotions.
 
-It goes beyond simple audio features by performing a **Multi-Modal Analysis**: it bridges raw **Audio Metrics** (Spotify) and **Lyrical Content** (Genius) to understand not just how a song _sounds_, but what it _says_.
+## ✨ Features
+
+- 🎭 **AI-Powered Vibe Analysis**: Uses local LLM to generate semantic descriptions of your music
+- 🔍 **Natural Language Search**: Find songs by describing the vibe you want
+- 🎨 **Beautiful Streamlit UI**: Modern, responsive interface for browsing and searching
+- 🔒 **100% Local & Private**: All AI processing happens on your machine
+- 📊 **Rich Track Metadata**: View popularity, genres, and Spotify links
+- 🎯 **Similarity Scores**: See how well each track matches your query
 
 ## 🧠 How it Works
 
-Standard Spotify search relies on metadata. This project uses a **Local RAG pipeline** to create a "Semantic Fingerprint" for every song:
+1. **Sync Your Library**
 
-1.  **Dual Extraction (ETL):**
-    - **Audio:** Fetches specific _Audio Features_ (Valence, Energy, Danceability, BPM) via Spotify API.
-    - **Lyrics:** Scrapes/Fetches song lyrics via the Genius API.
-2.  **Semantic Synthesis (Local LLM):**
-    - A local model (Ollama) acts as a music critic. It analyzes the **contrast** or **alignment** between the music and the words.
-    - _Input:_ `Valence: 0.8 (Happy)` + `Lyrics: "I'm so lonely"`
-    - _Output:_ _"An upbeat, high-energy track that disguises deep lyrical sorrow and isolation, creating an ironic, bittersweet atmosphere."_
-3.  **Embedding:** Vectorizes these complex synthesized descriptions into **ChromaDB**.
-4.  **Retrieval & Generation:**
-    - **User Query:** _"Songs that sound happy but are actually depressing."_
-    - **Vector Search:** Finds songs where the "Semantic Fingerprint" matches this specific contrast.
-    - **The DJ (Ollama):** Explains the choice: _"I picked 'Hey Ya!' because despite its high danceability, the lyrics explicitly discuss the inability to maintain a relationship."_
+   - Fetches your liked songs from Spotify
+   - Retrieves lyrics from Genius
+   - Analyzes each track with a local LLM to generate vibe descriptions
+
+2. **AI Analysis**
+
+   - Combines audio features (energy, valence, tempo) with lyrical content
+   - Generates rich, semantic descriptions like:
+     - _"An upbeat indie track with melancholic lyrics about lost love and nostalgia"_
+     - _"High-energy dance anthem with empowering lyrics about self-confidence"_
+
+3. **Semantic Search**
+   - Stores vibe descriptions as embeddings in ChromaDB
+   - Search using natural language: _"sad songs about heartbreak"_
+   - Returns tracks ranked by semantic similarity
 
 ## 🛠️ Tech Stack
 
-- **Language:** Python 3.12+
-- **Data Sources:**
-  - [Spotify Web API](https://developer.spotify.com/) (Audio Features)
-  - [Genius API](https://docs.genius.com/) (Lyrics)
-- **Inference Engine:** [Ollama](https://ollama.com/) (Llama 3 / Mistral)
-- **Vector Database:** [ChromaDB](https://www.trychroma.com/) (Local persistence)
-- **Orchestration:** LangChain
-- **Data Validation:** Pydantic
+### Backend
 
-## 🚀 Prerequisites
+- **Language**: Python 3.12+
+- **Framework**: Pydantic for data validation
+- **Dependency Injection**: dependency-injector
+- **Testing**: pytest
 
-1.  **Spotify App:** Get your `CLIENT_ID` and `CLIENT_SECRET` from the [Spotify Dashboard](https://developer.spotify.com/dashboard).
-2.  **Genius API:** Get a Client Access Token from the [Genius API Clients Page](https://genius.com/api-clients).
-3.  **Ollama:**
-    - Download and install [Ollama](https://ollama.com/download).
-    - Pull your model: `ollama pull llama3`
+### Data Sources
 
-## ⚙️ Configuration
+- **Spotify Web API**: Track metadata and audio features
+- **Genius API**: Song lyrics
 
-Create a `.env` file in the root directory:
+### AI & Vector Search
 
-```ini
-# Spotify Credentials
-SPOTIPY_CLIENT_ID='your_spotify_id'
-SPOTIPY_CLIENT_SECRET='your_spotify_secret'
-SPOTIPY_REDIRECT_URI='http://localhost:8888/callback'
+- **LLM**: Ollama (Llama 3.2 / Mistral)
+- **Embeddings**: Ollama nomic-embed-text
+- **Vector DB**: ChromaDB (local persistence)
 
-# Genius Credentials (Lyrics)
-GENIUS_ACCESS_TOKEN='your_genius_token'
+### UI
 
-# Ollama Settings
-OLLAMA_BASE_URL='http://localhost:11434'
-OLLAMA_MODEL='llama3'
+- **Framework**: Streamlit
+- **Styling**: Custom CSS
+- **Components**: Modular, reusable UI components
+
+## 🚀 Quick Start
+
+### Prerequisites
+
+1. **Spotify App**
+
+   - Create an app at [Spotify Dashboard](https://developer.spotify.com/dashboard)
+   - Get your `CLIENT_ID` and `CLIENT_SECRET`
+
+2. **Genius API**
+
+   - Get a token from [Genius API Clients](https://genius.com/api-clients)
+
+3. **Ollama**
+
+   ```bash
+   # Install Ollama
+   curl -fsSL https://ollama.com/install.sh | sh
+
+   # Pull required models
+   ollama pull llama3.2
+   ollama pull nomic-embed-text
+   ```
+
+### Installation
+
+1. **Clone the repository**
+
+   ```bash
+   git clone https://github.com/matiagimenez/spotify-rag.git
+   cd spotify-rag
+   ```
+
+2. **Set up environment**
+
+   ```bash
+   # Copy environment template
+   cp .env.sample .env
+
+   # Edit .env with your credentials
+   ```
+
+3. **Install dependencies**
+
+   ```bash
+   # Using uv (recommended)
+   uv sync
+   ```
+
+### Running the App
+
+```bash
+uv run poe dev
+```
+
+Navigate to `http://localhost:8501` in your browser.
+
+## 📖 Usage
+
+### 1. Connect to Spotify
+
+- Click "Connect with Spotify" on the home page
+- Authorize the application
+
+### 2. Sync Your Library
+
+- Choose how many songs to analyze (5-100)
+- Click "Sync Library"
+- Wait for the AI to analyze each track (2-3 seconds per song)
+
+### 3. Search by Vibe
+
+- Click "Search Vibes"
+- Enter a natural language description:
+  - _"upbeat songs about summer"_
+  - _"melancholic indie tracks"_
+  - _"energetic workout music"_
+- Adjust the number of results
+- View matches with similarity scores
+
+## 🏗️ Architecture
+
+```
+spotify_rag/
+├── domain/           # Domain models (Track, SearchResult, etc.)
+├── infrastructure/   # External integrations
+│   ├── spotify/     # Spotify API client
+│   ├── genius/      # Genius API client
+│   ├── llm/         # Ollama LLM client
+│   └── vectordb/    # ChromaDB repository
+├── services/        # Business logic
+│   ├── library_sync.py      # Sync and enrich tracks
+│   ├── track_analysis.py    # AI vibe analysis
+│   └── search.py            # Semantic search
+├── ui/              # Streamlit interface
+│   └── components/  # Reusable UI components
+└── utils/           # Utilities (logging, settings)
 ```
 
 ## 🤝 Contributing
 
-Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 📝 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
