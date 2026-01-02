@@ -21,19 +21,15 @@ def render_search_section() -> None:
             key="vibe_query",
         )
 
-        col1, col2 = st.columns([3, 1])
-        with col1:
-            n_results = st.slider(
-                "Number of results",
-                min_value=5,
-                max_value=20,
-                value=10,
-                step=5,
-            )
-        with col2:
-            search_button = st.button(
-                "Search", type="primary", use_container_width=True
-            )
+        search_button = st.button("Search", type="primary", use_container_width=True)
+
+        n_results = st.slider(
+            "Number of results",
+            min_value=5,
+            max_value=20,
+            value=10,
+            step=5,
+        )
 
         if search_button and query:
             with st.spinner("🔎 Searching for matching vibes..."):
