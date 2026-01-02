@@ -164,6 +164,7 @@ def test_count_tracks_empty(
     assert count == 0
 
 
+@pytest.mark.vcr
 def test_track_exists(
     vectordb_repository: VectorDBRepository,
     enriched_track_with_vibe: EnrichedTrack,
