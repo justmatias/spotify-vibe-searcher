@@ -6,7 +6,7 @@ import pytest
 from polyfactory.factories.pydantic_factory import ModelFactory
 
 from spotify_rag.domain import EnrichedTrack, SavedTrack
-from spotify_rag.infrastructure import VectorDBRepository
+from spotify_rag.infrastructure import LLMClient, VectorDBRepository
 from spotify_rag.services import SearchService
 from spotify_rag.utils import Settings
 
@@ -21,8 +21,15 @@ def vectordb_repository(tmp_path: pathlib.Path) -> Generator[VectorDBRepository]
 
 
 @pytest.fixture
+def llm_client() -> LLMClient:
+    return LLMClient()
+
+
+@pytest.fixture
 def search_service(vectordb_repository: VectorDBRepository) -> SearchService:
-    return SearchService(vectordb_repository=vectordb_repository)
+    return SearchService(
+        vectordb_repository=vectordb_repository, llm_client=LLMClient()
+    )
 
 
 @pytest.fixture

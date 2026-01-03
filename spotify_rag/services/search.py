@@ -1,12 +1,13 @@
 from pydantic import BaseModel
 
 from spotify_rag.domain import SearchResult, SearchResults
-from spotify_rag.infrastructure import VectorDBRepository
+from spotify_rag.infrastructure import LLMClient, VectorDBRepository
 from spotify_rag.utils import LogLevel, log
 
 
 class SearchService(BaseModel):
     vectordb_repository: VectorDBRepository
+    llm_client: LLMClient
 
     def search_by_vibe(self, query: str, n_results: int = 10) -> SearchResults:
         """Search for tracks by vibe description using semantic similarity.
@@ -20,7 +21,10 @@ class SearchService(BaseModel):
         """
         log(f"Searching for vibe: '{query}' (max {n_results} results)", LogLevel.INFO)
 
-        raw_results = self.vectordb_repository.search_by_vibe(query, n_results)
+        refined_query = self._refine_query(query)
+        log(f"Refined query: '{refined_query}'", LogLevel.INFO)
+
+        raw_results = self.vectordb_repository.search_by_vibe(refined_query, n_results)
         search_results = self._transform_results(query, raw_results)
 
         log(
@@ -29,6 +33,17 @@ class SearchService(BaseModel):
         )
 
         return search_results
+
+    def _refine_query(self, query: str) -> str:
+        """Refine the user query to be more descriptive for semantic search."""
+        prompt = (
+            "You are an expert music curator. Rewrite the following search query to be "
+            "more descriptive, capturing the mood, musical style, and lyrical themes "
+            "implied by the user. This description will be used for semantic search "
+            "against a database of song analyses. Return ONLY the refined query text.\n\n"
+            f"Original query: '{query}'"
+        )
+        return self.llm_client.generate(prompt)
 
     def _transform_results(
         self, query: str, raw_results: dict[str, list]

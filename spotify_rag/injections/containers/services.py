@@ -16,6 +16,7 @@ class ServicesContainer(containers.DeclarativeContainer):
     search_service = providers.Factory(
         SearchService,
         vectordb_repository=infrastructure.vectordb_repository,
+        llm_client=infrastructure.llm_client,
     )
 
     library_sync_service = providers.Factory(
