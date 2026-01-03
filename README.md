@@ -6,6 +6,7 @@
 ![ChromaDB](https://img.shields.io/badge/Vector-ChromaDB-green)
 ![Spotify API](https://img.shields.io/badge/Data-Spotify-1DB954)
 ![Genius](https://img.shields.io/badge/Lyrics-Genius-FFFF00)
+
 A **LLM-powered search engine** application that lets you search your Spotify "Liked Songs" library using natural language descriptions of vibes and emotions.
 
 > **Stop searching by Genre. Start searching by _Vibe_ and _Meaning_.** > **100% Local & Private.**
