@@ -1,3 +1,4 @@
+# pylint: disable=too-many-locals
 import pandas as pd
 import streamlit as st
 
@@ -12,13 +13,24 @@ def render_library_section() -> None:
     repository = container.infrastructure.vectordb_repository()
     count = repository.count_tracks()
 
-    col1, col2 = st.columns([1, 3])
+    col1, col2, col3 = st.columns([1, 2, 2])
     with col1:
         st.metric("Indexed Tracks", count)
 
     with col2:
         if st.button("🔄 Refresh", key="refresh_library"):
             st.rerun()
+
+    with col3:
+        if count > 0:
+            if st.button("🗑️ Clear Database", key="clear_library", type="secondary"):
+                with st.spinner("Clearing database..."):
+                    all_data = repository.get_all_tracks()
+                    track_ids = all_data.get("ids", [])
+                    if track_ids:
+                        repository.delete_tracks(track_ids)
+                        st.success(f"✅ Deleted {len(track_ids)} tracks from database!")
+                        st.rerun()
 
     if count > 0:
         with st.expander("View All Tracks", expanded=True):

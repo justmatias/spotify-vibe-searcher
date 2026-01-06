@@ -62,8 +62,14 @@ class SpotifyTrack(BaseModel):
         return ", ".join(artist.name for artist in self.artists)
 
     @property
-    def spotify_url(self) -> str | None:
-        return self.external_urls.get("spotify")
+    def spotify_url(self) -> str:
+        return self.external_urls.get("spotify", "")
+
+    @property
+    def all_genre_names(self) -> str:
+        """Get unique genre names from all artists as a comma-separated string."""
+        unique_genres = {genre for artist in self.artists for genre in artist.genres}
+        return ", ".join(unique_genres)
 
 
 class SavedTrack(BaseModel):
