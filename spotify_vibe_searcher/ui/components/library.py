@@ -1,3 +1,4 @@
+# pylint: disable=too-many-locals
 import pandas as pd
 import streamlit as st
 
