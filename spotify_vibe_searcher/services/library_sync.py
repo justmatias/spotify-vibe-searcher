@@ -97,16 +97,14 @@ class LibrarySyncService(BaseModel):
             for artist in saved_track.track.artists:
                 artist_ids.append(artist.id_)
 
-        if not artist_ids:
-            return
-
         artists_with_genres = self.spotify_client.get_artists(artist_ids)
         artist_map = {artist.id_: artist for artist in artists_with_genres}
 
         for saved_track in saved_tracks:
-            for i, artist in enumerate(saved_track.track.artists):
-                if artist.id_ in artist_map:
-                    saved_track.track.artists[i] = artist_map[artist.id_]
+            saved_track.track.artists = [
+                artist_map.get(artist.id_, artist)
+                for artist in saved_track.track.artists
+            ]
 
         log(
             f"Enriched {len(artists_with_genres)} artists with genre data.",
