@@ -168,13 +168,14 @@ Since Genius is slow, the UI is critical.
 
 ### 7.1 Error Handling & Resilience
 
-- [x] **Retry Logic with Exponential Backoff**: Add retry decorators to Genius and Spotify API calls.
-  - **Files:** `infrastructure/genius/client.py`, `infrastructure/spotify/client.py`
-  - **Implementation:** Use `stamina` library for configurable retry policies.
+- [x] **Retry Logic with Exponential Backoff**: Add retry decorators to all API calls.
+  - **Files:** `infrastructure/*/client.py`, `infrastructure/*/config.py`
+  - **Implementation:** Used `stamina` library with `RETRY_ON` constants in config files.
+  - **Clients updated:** `GeniusClient`, `LLMClient`, `SpotifyClient`, `SpotifyAuthManager`
 
 - [x] **Graceful Degradation**: Continue sync even if individual track enrichment fails.
   - **Files:** `services/library_sync.py`
-  - **Current:** Partial implementation exists; ensure all exceptions are caught and logged.
+  - **Implementation:** Wrapped track enrichment in try/except, logs warning and continues.
 
 
 ### 7.2 Performance Optimizations
