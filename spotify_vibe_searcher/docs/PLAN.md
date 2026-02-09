@@ -168,11 +168,11 @@ Since Genius is slow, the UI is critical.
 
 ### 7.1 Error Handling & Resilience
 
-- [ ] **Retry Logic with Exponential Backoff**: Add retry decorators to Genius and Spotify API calls.
+- [x] **Retry Logic with Exponential Backoff**: Add retry decorators to Genius and Spotify API calls.
   - **Files:** `infrastructure/genius/client.py`, `infrastructure/spotify/client.py`
   - **Implementation:** Use `stamina` library for configurable retry policies.
 
-- [ ] **Graceful Degradation**: Continue sync even if individual track enrichment fails.
+- [x] **Graceful Degradation**: Continue sync even if individual track enrichment fails.
   - **Files:** `services/library_sync.py`
   - **Current:** Partial implementation exists; ensure all exceptions are caught and logged.
 
@@ -241,10 +241,10 @@ Since Genius is slow, the UI is critical.
 ```mermaid
 graph TB
     subgraph Users
-        A[Current User] 
+        A[Current User]
         B[Friend User]
     end
-    
+
     subgraph LightRAG Knowledge Graph
         C[User Entities]
         D[Track Entities]
@@ -252,14 +252,14 @@ graph TB
         F[Genre Entities]
         G[Vibe Descriptions]
     end
-    
+
     subgraph Relationships
         H[LIKES]
         I[PERFORMS]
         J[HAS_GENRE]
         K[SIMILAR_TO]
     end
-    
+
     A --> H --> D
     B --> H --> D
     D --> I --> E
@@ -311,22 +311,22 @@ from lightrag import LightRAG, QueryParam
 
 class LightRAGClient:
     """LightRAG client for graph-based music knowledge."""
-    
+
     def __init__(self, storage_dir: Path):
         self.rag = LightRAG(
             working_dir=storage_dir,
             llm_model="ollama/llama3.2",
             embedding_model="ollama/nomic-embed-text"
         )
-    
+
     def add_user_library(self, user_id: str, tracks: list[EnrichedTrack]) -> None:
         """Index a user's library into the knowledge graph."""
         ...
-    
+
     def query_similarity(self, user_a: str, user_b: str) -> MusicSimilarity:
         """Query the knowledge graph for user similarity."""
         ...
-    
+
     def get_cross_recommendations(self, source_user: str, target_user: str) -> list[str]:
         """Get track recommendations from target user's library for source user."""
         ...
@@ -353,24 +353,24 @@ def get_playlist_tracks(self, playlist_id: str) -> list[SavedTrack]:
 ```python
 class UserComparisonService:
     """Service for comparing music tastes between users."""
-    
+
     spotify_client: SpotifyClient
     lightrag_client: LightRAGClient
     genius_client: GeniusClient
     track_analysis_service: TrackAnalysisService
-    
+
     def fetch_friend_library(self, spotify_username: str) -> list[EnrichedTrack]:
         """Fetch and enrich a friend's public library."""
         ...
-    
+
     def calculate_similarity(self, my_profile: UserProfile, friend_profile: UserProfile) -> MusicSimilarity:
         """Calculate similarity metrics between two users."""
         ...
-    
+
     def generate_recommendations(self, similarity: MusicSimilarity) -> list[str]:
         """Generate track recommendations based on music overlap."""
         ...
-    
+
     def create_comparison_visualization(self, result: ComparisonResult) -> str:
         """Generate visual comparison charts."""
         ...
@@ -571,9 +571,9 @@ Agent: [Thought] User wants nostalgic 90s music from their library
         ↓
 Agent: "Found 8 nostalgic tracks from the 90s! Here are the top 3:
         1. 🎵 Wonderwall - Oasis
-        2. 🎵 Creep - Radiohead  
+        2. 🎵 Creep - Radiohead
         3. 🎵 Losing My Religion - R.E.M.
-        
+
         Want me to discover more like these or create a playlist?"
         ↓
 User: "Yes, create a playlist called 'Rainy Day Nostalgia'"
@@ -581,7 +581,7 @@ User: "Yes, create a playlist called 'Rainy Day Nostalgia'"
 Agent: [Action] create_playlist("Rainy Day Nostalgia", [...track_ids])
        [Observation] Playlist created successfully
         ↓
-Agent: "Done! Created 'Rainy Day Nostalgia' with 8 tracks. 
+Agent: "Done! Created 'Rainy Day Nostalgia' with 8 tracks.
         🔗 Open in Spotify: https://..."
 ```
 
@@ -594,16 +594,16 @@ Define tool wrappers that integrate with existing services.
 ```python
 class MusicDJAgent:
     """ReAct agent for conversational music interaction."""
-    
+
     def __init__(self, llm_client: LLMClient, tools: list[Tool]):
         self.llm = llm_client
         self.tools = {t.name: t for t in tools}
         self.conversation_history: list[Message] = []
-    
+
     def chat(self, user_message: str) -> str:
         """Process user message and return agent response."""
         ...
-    
+
     def _reason_and_act(self, prompt: str) -> tuple[str, str | None]:
         """Execute ReAct loop: Thought → Action → Observation."""
         ...
@@ -663,4 +663,3 @@ Add "Chat with DJ" tab/section for agent interaction.
   - Output: Playlist optimized for overlap + balanced exploration
 - [ ] **Leaderboards**: "Most eclectic taste", "Genre specialist", etc.
 - [ ] **Music Compatibility Score**: Dating-app style compatibility percentage
-

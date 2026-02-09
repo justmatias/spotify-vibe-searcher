@@ -1,5 +1,10 @@
 import re
 
+from requests.exceptions import RequestException
+
+# Retry configuration for Genius API calls
+RETRY_ON = (RequestException, TimeoutError, ConnectionError)
+
 # Compiled pattern for removing common title suffixes that hurt search accuracy
 # Matches: " - Remastered...", "(Remastered...)", "[Live...]", etc.
 TITLE_CLEANUP_PATTERN = re.compile(

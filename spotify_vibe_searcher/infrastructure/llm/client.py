@@ -1,26 +1,20 @@
 from functools import cached_property
 
 import stamina
-from openai import APIConnectionError, APITimeoutError, OpenAI
+from openai import OpenAI
 from pydantic import BaseModel
 
 from spotify_vibe_searcher.utils import LogLevel, Settings, log
+
+from .config import RETRY_ON
 
 
 class LLMClient(BaseModel):
     @cached_property
     def client(self) -> OpenAI:
-        return OpenAI(
-            base_url=Settings.LLM_BASE_URL,
-            api_key=Settings.LLM_API_KEY,
-        )
+        return OpenAI(base_url=Settings.LLM_BASE_URL, api_key=Settings.LLM_API_KEY)
 
-    @stamina.retry(
-        on=(APIConnectionError, APITimeoutError, ConnectionError, TimeoutError),
-        attempts=3,
-        wait_initial=2.0,
-        wait_max=10.0,
-    )
+    @stamina.retry(on=RETRY_ON, attempts=3)
     def generate(self, prompt: str) -> str:
         try:
             response = self.client.chat.completions.create(
@@ -29,7 +23,7 @@ class LLMClient(BaseModel):
                 temperature=Settings.TEMPERATURE,
             )
             return response.choices[0].message.content.strip()  # type: ignore[no-any-return]
-        except (APIConnectionError, APITimeoutError, ConnectionError, TimeoutError):
+        except RETRY_ON:
             raise
         except Exception as e:
             log(f"LLM generation failed: {e}", LogLevel.ERROR)
