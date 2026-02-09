@@ -176,9 +176,6 @@ Since Genius is slow, the UI is critical.
   - **Files:** `services/library_sync.py`
   - **Current:** Partial implementation exists; ensure all exceptions are caught and logged.
 
-- [ ] **Rate Limiting**: Implement rate limiter to respect API quotas.
-  - **Files:** New file `utils/rate_limiter.py`
-  - **Implementation:** Use token bucket algorithm for Genius API (5 req/sec limit).
 
 ### 7.2 Performance Optimizations
 
