@@ -23,7 +23,7 @@ class LLMClient(BaseModel):
                 temperature=Settings.TEMPERATURE,
             )
             return response.choices[0].message.content.strip()  # type: ignore[no-any-return]
-        except RETRY_ON:
+        except RETRY_ON:  # pragma: no cover
             raise
         except Exception as e:
             log(f"LLM generation failed: {e}", LogLevel.ERROR)

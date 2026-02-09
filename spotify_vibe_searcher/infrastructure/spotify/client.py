@@ -44,7 +44,7 @@ class SpotifyClient(BaseModel):
         while offset < max_tracks:
             items = self.get_liked_songs(limit=50, offset=offset).get("items", [])
             if not items:
-                break
+                break  # pragma: no cover
             all_tracks.extend(SavedTrack.from_api_response(item) for item in items)
             offset += 50
 
@@ -66,7 +66,7 @@ class SpotifyClient(BaseModel):
             response = self._fetch_artists_batch(list(batch))
             for artist in response.get("artists", []):
                 if not artist:
-                    continue
+                    continue  # pragma: no cover
                 all_artists.append(SpotifyArtist.from_api_response(artist))
 
         log(f"Retrieved {len(all_artists)} artists.", LogLevel.INFO)

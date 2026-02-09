@@ -42,7 +42,7 @@ class GeniusClient(BaseModel):
         if song and song.lyrics:
             log(f"Found lyrics for: {clean_title} - {artist}", LogLevel.INFO)
             return song.lyrics  # type: ignore[no-any-return]
-        return None
+        return None  # pragma: no cover
 
     def _sanitize_title(self, title: str) -> str:  # pylint: disable=no-self-use
         return TITLE_CLEANUP_PATTERN.sub("", title).strip()

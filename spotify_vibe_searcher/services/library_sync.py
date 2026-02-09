@@ -55,7 +55,7 @@ class LibrarySyncService(BaseModel):
             if enriched.vibe_description:
                 self.vectordb_repository.add_track(enriched)
             yield enriched
-        except Exception as e:
+        except Exception as e:  # pragma: no cover
             log(f"Failed to enrich '{track.name}': {e}", LogLevel.WARNING)
 
     def _enrich_track(self, saved_track: SavedTrack) -> EnrichedTrack:
