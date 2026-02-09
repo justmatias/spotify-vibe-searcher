@@ -1,6 +1,52 @@
 # CHANGELOG
 
 
+## v0.8.0 (2026-01-06)
+
+### Bug Fixes
+
+- **config**: Add `all_genre_names` property for unique genre aggregation, standardize `spotify_url`
+  output,
+  ([`a091ba0`](https://github.com/matiagimenez/spotify-vibe-searcher/commit/a091ba0d2fec0a0ca4f9a91f84cd75ee1bbedb1e))
+
+### Chores
+
+- **config**: Disable pylint too-many-locals warning
+  ([`5aae8a2`](https://github.com/matiagimenez/spotify-vibe-searcher/commit/5aae8a221b75f7e80b932b998d897aa82fb732bc))
+
+- **config**: Rename project module
+  ([`9fc9456`](https://github.com/matiagimenez/spotify-vibe-searcher/commit/9fc94567e3aac1cf643d96c3068f27c683ad89f8))
+
+- **config**: Update project description
+  ([`3d50ce5`](https://github.com/matiagimenez/spotify-vibe-searcher/commit/3d50ce5012b247fe78733020eb18e7c2b2174aff))
+
+- **docs**: Update docs
+  ([`aff30f2`](https://github.com/matiagimenez/spotify-vibe-searcher/commit/aff30f2e782b1a836a8dbb8f1eb42260fcfc5281))
+
+- **docs**: Update readme
+  ([`ac3c526`](https://github.com/matiagimenez/spotify-vibe-searcher/commit/ac3c52667c7a134023e35af62d830ab985796028))
+
+- **docs**: Update readme
+  ([`bd1f11d`](https://github.com/matiagimenez/spotify-vibe-searcher/commit/bd1f11d98d77880c4950ee7d75a6a36f8590e6b8))
+
+- **docs**: Update readme
+  ([`a91ab66`](https://github.com/matiagimenez/spotify-vibe-searcher/commit/a91ab663d8c5a7a6965c9f7a4a856bab24d77a5a))
+
+### Features
+
+- **config**: Enrich artist genres during library sync and add debug logging for track storage and
+  analysis prompts
+  ([`1a19af4`](https://github.com/matiagimenez/spotify-vibe-searcher/commit/1a19af4c1b74374184cafa3b83f9d70e59695855))
+
+- **config**: Introduce a UI button to clear the database
+  ([`67fc911`](https://github.com/matiagimenez/spotify-vibe-searcher/commit/67fc911e1bf276a2c68d5a868116d038619e3e92))
+
+### Refactoring
+
+- **config**: Remove early exit and use list comprehension with `get` for artist enrichment
+  ([`7ddb164`](https://github.com/matiagimenez/spotify-vibe-searcher/commit/7ddb164ef1b2e51ac8f773650042d7cd6055a2ae))
+
+
 ## v0.7.0 (2026-01-03)
 
 ### Bug Fixes

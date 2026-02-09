@@ -47,16 +47,22 @@ class VectorDBRepository(BaseModel):
             return
 
         track = enriched_track.track.track
+
         metadata = {
             "track_id": enriched_track.track_id,
             "track_name": track.name,
             "artist_names": track.artist_names,
             "album_name": track.album.name,
             "has_lyrics": enriched_track.has_lyrics,
-            "genres": ", ".join(artist.genre_names for artist in track.artists),
+            "genres": track.all_genre_names,
             "popularity": track.popularity,
-            "spotify_url": track.spotify_url or "",
+            "spotify_url": track.spotify_url,
         }
+
+        log(
+            f"Storing track '{track.name}' with genres: '{track.all_genre_names}'",
+            LogLevel.DEBUG,
+        )
 
         self.collection.add(
             ids=[enriched_track.track_id],

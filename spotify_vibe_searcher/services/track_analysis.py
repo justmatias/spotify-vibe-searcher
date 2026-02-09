@@ -13,7 +13,7 @@ class TrackAnalysisService(BaseModel):
     def _build_analysis_prompt(self, saved_track: SavedTrack, lyrics: str) -> str:  # pylint: disable=no-self-use
         genres = []
         for artist in saved_track.track.artists:
-            genres.extend(artist.genre_names)
+            genres.extend(artist.genres)
 
         prompt = f"""
         Act as an expert music critic. Analyze this song:
@@ -36,12 +36,12 @@ class TrackAnalysisService(BaseModel):
 
             Vibe Description:
         """
-
         return prompt
 
     def analyze_track(self, saved_track: SavedTrack, lyrics: str) -> str | None:
         try:
             prompt = self._build_analysis_prompt(saved_track, lyrics)
+            log(f"Prompt: {prompt}", LogLevel.DEBUG)
             vibe_description = self.llm_client.generate(prompt)
             log(
                 f"Generated vibe description for: {saved_track.track.name}",
