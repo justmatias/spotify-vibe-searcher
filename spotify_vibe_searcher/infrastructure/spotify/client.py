@@ -29,11 +29,11 @@ class SpotifyClient(BaseModel):
 
     @stamina.retry(on=RETRY_ON, attempts=3)
     def _fetch_current_user(self) -> dict[str, Any]:
-        return self.client.current_user()
+        return self.client.current_user()  # type: ignore[no-any-return]
 
     @stamina.retry(on=RETRY_ON, attempts=3)
     def get_liked_songs(self, limit: int = 50, offset: int = 0) -> dict[str, Any]:
-        return self.client.current_user_saved_tracks(limit=limit, offset=offset)
+        return self.client.current_user_saved_tracks(limit=limit, offset=offset)  # type: ignore[no-any-return]
 
     def get_all_liked_songs(self, max_tracks: int = 500) -> list[SavedTrack]:
         log(f"Fetching up to {max_tracks} liked songs...", LogLevel.INFO)
@@ -54,7 +54,7 @@ class SpotifyClient(BaseModel):
 
     @stamina.retry(on=RETRY_ON, attempts=3)
     def _fetch_artists_batch(self, batch: list[str]) -> dict[str, Any]:
-        return self.client.artists(batch)
+        return self.client.artists(batch)  # type: ignore[no-any-return]
 
     def get_artists(self, artist_ids: list[str]) -> list[SpotifyArtist]:
         unique_ids = sorted(set(artist_ids))

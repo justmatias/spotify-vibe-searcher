@@ -41,7 +41,7 @@ class GeniusClient(BaseModel):
         song = self.client.search_song(clean_title, artist)
         if song and song.lyrics:
             log(f"Found lyrics for: {clean_title} - {artist}", LogLevel.INFO)
-            return song.lyrics
+            return song.lyrics  # type: ignore[no-any-return]
         return None
 
     def _sanitize_title(self, title: str) -> str:  # pylint: disable=no-self-use

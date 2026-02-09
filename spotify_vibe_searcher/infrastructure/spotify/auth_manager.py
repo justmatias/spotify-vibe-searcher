@@ -27,12 +27,12 @@ class SpotifyAuthManager(BaseModel):
         )
 
     def get_auth_url(self) -> str:
-        return self.oauth.get_authorize_url()
+        return self.oauth.get_authorize_url()  # type: ignore[no-any-return]
 
     @stamina.retry(on=RETRY_ON, attempts=3)
     def get_access_token(self, code: str) -> dict[str, Any] | None:
         try:
-            return self.oauth.get_access_token(code, as_dict=True)
+            return self.oauth.get_access_token(code, as_dict=True)  # type: ignore[no-any-return]
         except Exception as e:
             log(f"Failed to get access token: {e}", LogLevel.WARNING)
             return None
@@ -41,12 +41,12 @@ class SpotifyAuthManager(BaseModel):
         token_info = self.oauth.cache_handler.get_cached_token()
         if not token_info:
             return None
-        return self.oauth.validate_token(token_info)
+        return self.oauth.validate_token(token_info)  # type: ignore[no-any-return]
 
     @stamina.retry(on=RETRY_ON, attempts=3)
     def refresh_token(self, refresh_token: str) -> dict[str, Any] | None:
         try:
-            return self.oauth.refresh_access_token(refresh_token)
+            return self.oauth.refresh_access_token(refresh_token)  # type: ignore[no-any-return]
         except Exception as e:
             log(f"Failed to refresh token: {e}", LogLevel.WARNING)
             return None

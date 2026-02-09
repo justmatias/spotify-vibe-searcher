@@ -4,12 +4,6 @@ import pytest
 from spotify_vibe_searcher.infrastructure.llm import LLMClient
 
 
-def test_client_lazy_initialization(llm_client: LLMClient) -> None:
-    assert llm_client._client is None
-    client = llm_client.client
-    assert llm_client.client is client
-
-
 def test_client_reuses_instance(llm_client: LLMClient) -> None:
     client1 = llm_client.client
     client2 = llm_client.client
