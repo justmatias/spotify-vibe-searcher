@@ -20,10 +20,10 @@ def render_sidebar() -> None:
         st.markdown("---")
         st.markdown("#### Quick Links")
         st.markdown(
-            "[📖 Documentation](https://github.com/matiagimenez/spotify-vibe-searcher)"
+            "[📖 Documentation](https://github.com/justmatias/spotify-vibe-searcher)"
         )
         st.markdown(
-            "[🐛 Report Issue](https://github.com/matiagimenez/spotify-vibe-searcher/issues)"
+            "[🐛 Report Issue](https://github.com/justmatias/spotify-vibe-searcher/issues)"
         )
 
         st.markdown("---")
