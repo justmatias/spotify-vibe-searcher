@@ -42,7 +42,7 @@ This project builds a semantic search engine for your Spotify "Liked Songs" libr
 
 ## 📅 Implementation Phases
 
-### Phase 1: Environment & Credentials (x2)
+## Phase 1: Environment & Credentials
 
 You now need keys for two different kingdoms.
 
@@ -64,7 +64,7 @@ You now need keys for two different kingdoms.
    OPENAI_API_KEY="sk-..."
    ```
 
-### Phase 2: Data Ingestion (The Bottleneck)
+## Phase 2: Data Ingestion
 
 This is where the slow magic happens. Downloading lyrics takes longer than fetching metadata.
 
@@ -81,7 +81,7 @@ This is where the slow magic happens. Downloading lyrics takes longer than fetch
    - _Call:_ `song = genius.search_song(title, artist)`.
    - _Error Handling:_ If no lyrics are found or a timeout occurs, save `lyrics: "Not found/Instrumental"`.
 
-### Phase 3: Deep Vibe Enrichment
+## Phase 3: Deep Vibe Enrichment
 
 The prompt is now much more sophisticated to leverage the textual data.
 
@@ -108,14 +108,14 @@ The prompt is now much more sophisticated to leverage the textual data.
 
 3. **Result:** _"An Indie Pop track with an upbeat tempo, but the lyrics sarcastically address modern social isolation."_
 
-### Phase 4: Vector Storage
+## Phase 4: Vector Storage
 
 Similar to the previous plan, but the embedding quality will be superior.
 
 1. **Embed:** Use `text-embedding-3-small` on the generated description.
 2. **Metadata:** Store `has_lyrics: bool` in ChromaDB so you can filter later if desired.
 
-### Phase 5: Retrieval & Chat
+## Phase 5: Retrieval & Chat
 
 The search flow remains, but the "DJ" response will be smarter.
 
@@ -123,7 +123,7 @@ The search flow remains, but the "DJ" response will be smarter.
 2. **Match:** Thanks to the Phase 3 analysis, the system will find those songs with cognitive dissonance.
 3. **Response:** The LLM can quote a line from the lyrics to justify its choice.
 
-### Phase 6: UI with Progress Feedback
+## Phase 6: UI with Progress Feedback
 
 Since Genius is slow, the UI is critical.
 
@@ -162,7 +162,7 @@ Since Genius is slow, the UI is critical.
 
 ---
 
-## 🔧 Phase 7: Code Quality Improvements
+## Phase 7: Code Quality Improvements 🔧
 
 > **Goal:** Enhance the current implementation with better practices, performance, and maintainability.
 
@@ -170,7 +170,7 @@ Since Genius is slow, the UI is critical.
 
 - [ ] **Retry Logic with Exponential Backoff**: Add retry decorators to Genius and Spotify API calls.
   - **Files:** `infrastructure/genius/client.py`, `infrastructure/spotify/client.py`
-  - **Implementation:** Use `tenacity` library for configurable retry policies.
+  - **Implementation:** Use `stamina` library for configurable retry policies.
 
 - [ ] **Graceful Degradation**: Continue sync even if individual track enrichment fails.
   - **Files:** `services/library_sync.py`
@@ -222,7 +222,7 @@ Since Genius is slow, the UI is critical.
 
 ---
 
-## 🆕 Phase 8: User Music Similarity Feature (LightRAG Integration)
+## Phase 8: User Music Similarity Feature (LightRAG) 🆕
 
 > **Goal:** Enable users to compare their music taste with friends by adding their Spotify username, generating a similarity map, and providing cross-library recommendations.
 
@@ -517,12 +517,153 @@ uv run pytest tests/infrastructure/lightrag/ -v
    - Test responsive layout on different screen sizes
    - Check error handling for invalid usernames
 
+## Phase 9: ReAct Music DJ Agent 🤖
+
+> **Goal:** Implement a conversational AI agent that can use tools to search, discover, and manage music through natural conversation.
+
+### Why ReAct Agent?
+
+The ReAct (Reasoning + Acting) pattern allows the agent to:
+1. **Reason** about user intent from natural language
+2. **Act** by calling appropriate tools
+3. **Observe** results and decide next steps
+4. **Respond** with context-aware answers
+
+### 9.1 Agent Tools
+
+```python
+@tool
+def search_library_by_vibe(query: str, n_results: int = 10) -> list[SearchResult]:
+    """Search user's liked songs by vibe description."""
+    ...
+
+@tool
+def discover_new_music(seed_query: str, n_results: int = 10) -> list[Track]:
+    """Discover new music from Spotify based on vibe seeds."""
+    ...
+
+@tool
+def create_playlist(name: str, track_ids: list[str]) -> str:
+    """Create a Spotify playlist with given tracks."""
+    ...
+
+@tool
+def get_track_analysis(track_id: str) -> str:
+    """Get AI vibe description for a specific track."""
+    ...
+
+@tool
+def compare_with_friend(friend_username: str) -> MusicSimilarity:
+    """Compare music taste with a friend (Phase 8 integration)."""
+    ...
+
+@tool
+def play_preview(track_id: str) -> str:
+    """Get 30-second preview URL for a track."""
+    ...
+```
+
+### 9.2 Conversation Flow
+
+```
+User: "I'm feeling nostalgic, find me something from the 90s"
+        ↓
+Agent: [Thought] User wants nostalgic 90s music from their library
+       [Action] search_library_by_vibe("nostalgic 90s vibes")
+       [Observation] Found 8 tracks matching the query
+        ↓
+Agent: "Found 8 nostalgic tracks from the 90s! Here are the top 3:
+        1. 🎵 Wonderwall - Oasis
+        2. 🎵 Creep - Radiohead  
+        3. 🎵 Losing My Religion - R.E.M.
+        
+        Want me to discover more like these or create a playlist?"
+        ↓
+User: "Yes, create a playlist called 'Rainy Day Nostalgia'"
+        ↓
+Agent: [Action] create_playlist("Rainy Day Nostalgia", [...track_ids])
+       [Observation] Playlist created successfully
+        ↓
+Agent: "Done! Created 'Rainy Day Nostalgia' with 8 tracks. 
+        🔗 Open in Spotify: https://..."
+```
+
+### 9.3 Implementation Details
+
+#### [NEW] `infrastructure/agent/tools.py`
+Define tool wrappers that integrate with existing services.
+
+#### [NEW] `infrastructure/agent/agent.py`
+```python
+class MusicDJAgent:
+    """ReAct agent for conversational music interaction."""
+    
+    def __init__(self, llm_client: LLMClient, tools: list[Tool]):
+        self.llm = llm_client
+        self.tools = {t.name: t for t in tools}
+        self.conversation_history: list[Message] = []
+    
+    def chat(self, user_message: str) -> str:
+        """Process user message and return agent response."""
+        ...
+    
+    def _reason_and_act(self, prompt: str) -> tuple[str, str | None]:
+        """Execute ReAct loop: Thought → Action → Observation."""
+        ...
+```
+
+#### [NEW] `ui/components/chat.py`
+Chat interface component for agent interaction.
+
+#### [MODIFY] `ui/app.py`
+Add "Chat with DJ" tab/section for agent interaction.
+
 ---
 
-## 🔮 Long Term (AI & Experience)
+## Phase 10: Personalized Vibe Models 🧠
 
-- [ ] **Personalized Vibe Models**: Fine-tune a small LoRA adapter on the user's specific taste descriptions.
-- [ ] **Voice Search**: "Hey, play me something for a rainy Sunday."
-- [ ] **Multi-Modal Input**: Upload a photo (e.g., a sunset) and get songs that match the visual vibe (using LLaVA or similar vision models).
-- [ ] **Social Features**: Share similarity results, challenge friends to match music taste.
-- [ ] **Group Playlists**: Generate playlists that satisfy multiple users' preferences simultaneously.
+> **Goal:** Fine-tune music understanding to individual user preferences.
+
+### Features
+- [ ] Train LoRA adapter on user's vibe descriptions and feedback
+- [ ] Learn user's genre preferences and emotional associations
+- [ ] Improve search relevance based on user history
+- [ ] "Teach" the model new vibes: "When I say 'coding music' I mean..."
+
+### Implementation
+- Export user's library + vibe descriptions as training data
+- Fine-tune small adapter (e.g., 7B parameter model)
+- A/B test personalized vs generic model responses
+
+---
+
+## Phase 11: Voice & Multi-Modal Input 🎙️
+
+> **Goal:** Enable natural voice commands and image-based music discovery.
+
+### 11.1 Voice Search
+- [ ] Integrate Whisper (local) for speech-to-text
+- [ ] Voice command: "Hey DJ, play something for a rainy Sunday"
+- [ ] Voice feedback: "Not this vibe, something more upbeat"
+
+### 11.2 Multi-Modal Input
+- [ ] Accept image uploads (sunset photo, party scene, etc.)
+- [ ] Use vision model (LLaVA/GPT-4V) to describe image mood
+- [ ] Convert visual vibe to music search query
+- [ ] Example: Upload beach sunset → "Chill, warm, nostalgic summer vibes"
+
+---
+
+## Phase 12: Social Features 🌐
+
+> **Goal:** Make music discovery a social experience.
+
+### Features
+- [ ] **Share Results**: Generate shareable cards for similarity comparisons
+- [ ] **Taste Challenges**: "Can you guess which song I like more?"
+- [ ] **Group Playlists**: Collaborative playlist that satisfies multiple users
+  - Input: 3 friends' usernames
+  - Output: Playlist optimized for overlap + balanced exploration
+- [ ] **Leaderboards**: "Most eclectic taste", "Genre specialist", etc.
+- [ ] **Music Compatibility Score**: Dating-app style compatibility percentage
+
