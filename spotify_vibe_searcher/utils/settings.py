@@ -56,17 +56,18 @@ class AppSettings(BaseSettings):
         default="nomic-embed-text:v1.5",
         description="Embedding model to use",
     )
-
     LLM_BASE_URL: str = Field(
         default="http://localhost:11434/v1",
         description="LLM API base URL",
     )
-
     LLM_MODEL: str = Field(
         default="llama3.2:3b",
         description="LLM model for semantic analysis",
     )
-
+    LLM_API_KEY: str = Field(
+        default="ollama",  # Ollama doesn't need a real API key
+        description="LLM API key",
+    )
     TEMPERATURE: float = Field(
         default=0.7,
         description="Temperature for LLM generation",

@@ -46,6 +46,7 @@ repos:
           - pytest==9.0.2
           - polyfactory==3.2.0
           - dependency-injector==4.48.3
+          - stamina==25.2.0
 
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: v1.19.1
@@ -61,3 +62,5 @@ repos:
           - streamlit==1.52.2
           - pytest==9.0.2
           - polyfactory==3.2.0
+          - types-requests==2.32.4.20260107
+          - stamina==25.2.0

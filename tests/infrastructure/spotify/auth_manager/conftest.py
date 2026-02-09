@@ -21,7 +21,9 @@ def mock_oauth_instance(mock_spotify_oauth: MagicMock) -> MagicMock:
 
 @pytest.fixture
 def auth_manager(mock_oauth_instance: MagicMock) -> SpotifyAuthManager:
-    return SpotifyAuthManager(_oauth=mock_oauth_instance)
+    auth_manager = SpotifyAuthManager()
+    auth_manager.__dict__["oauth"] = mock_oauth_instance
+    return auth_manager
 
 
 @pytest.fixture

@@ -1,40 +1,41 @@
-import contextlib
-from dataclasses import dataclass
+from functools import cached_property
 from typing import Any
 
+import stamina
+from pydantic import BaseModel
 from spotipy.oauth2 import CacheFileHandler, SpotifyOAuth
 
-from spotify_vibe_searcher.utils import Settings
+from spotify_vibe_searcher.utils import LogLevel, Settings, log
+
+from .config import RETRY_ON
 
 
-@dataclass
-class SpotifyAuthManager:
-    _oauth: SpotifyOAuth | None = None
+class SpotifyAuthManager(BaseModel):
+    model_config = {"arbitrary_types_allowed": True}
 
-    @property
+    @cached_property
     def oauth(self) -> SpotifyOAuth:
-        """Get or create the SpotifyOAuth instance."""
-        if self._oauth is None:
-            cache_handler = CacheFileHandler(
+        return SpotifyOAuth(
+            client_id=Settings.SPOTIFY_CLIENT_ID,
+            client_secret=Settings.SPOTIFY_CLIENT_SECRET,
+            redirect_uri=Settings.SPOTIFY_REDIRECT_URI,
+            scope=Settings.SPOTIFY_SCOPES,
+            cache_handler=CacheFileHandler(
                 cache_path=str(Settings.CACHE_PATH / ".spotify_cache")
-            )
-            self._oauth = SpotifyOAuth(
-                client_id=Settings.SPOTIFY_CLIENT_ID,
-                client_secret=Settings.SPOTIFY_CLIENT_SECRET,
-                redirect_uri=Settings.SPOTIFY_REDIRECT_URI,
-                scope=Settings.SPOTIFY_SCOPES,
-                cache_handler=cache_handler,
-                show_dialog=True,
-            )
-        return self._oauth
+            ),
+            show_dialog=True,
+        )
 
     def get_auth_url(self) -> str:
         return self.oauth.get_authorize_url()  # type: ignore[no-any-return]
 
+    @stamina.retry(on=RETRY_ON, attempts=3)
     def get_access_token(self, code: str) -> dict[str, Any] | None:
-        with contextlib.suppress(Exception):
+        try:
             return self.oauth.get_access_token(code, as_dict=True)  # type: ignore[no-any-return]
-        return None
+        except Exception as e:
+            log(f"Failed to get access token: {e}", LogLevel.WARNING)
+            return None
 
     def get_cached_token(self) -> dict[str, Any] | None:
         token_info = self.oauth.cache_handler.get_cached_token()
@@ -42,7 +43,10 @@ class SpotifyAuthManager:
             return None
         return self.oauth.validate_token(token_info)  # type: ignore[no-any-return]
 
+    @stamina.retry(on=RETRY_ON, attempts=3)
     def refresh_token(self, refresh_token: str) -> dict[str, Any] | None:
-        with contextlib.suppress(Exception):
+        try:
             return self.oauth.refresh_access_token(refresh_token)  # type: ignore[no-any-return]
-        return None
+        except Exception as e:
+            log(f"Failed to refresh token: {e}", LogLevel.WARNING)
+            return None

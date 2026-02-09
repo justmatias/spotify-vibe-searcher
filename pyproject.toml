@@ -3,31 +3,32 @@ requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "spotify-rag"
+name = "spotify-vibe-searcher"
 version = "0.0.1"
 description = "Spotify Vibe Searcher is a LLM-powered search engine application that allows you to search your personal Spotify liked songs library using natural language abstract descriptions"
 readme = "README.md"
 license = { text = "MIT" }
 
-authors = [ { name = "Matias Gimenez", email = "matiasgimenez.dev@gmail.com" } ]
+authors = [{ name = "Matias Gimenez", email = "matiasgimenez.dev@gmail.com" }]
 requires-python = ">=3.12"
 dependencies = [
-    "lyricsgenius>=3.7.5",
-    "python-dotenv>=1.2.1",
-    "spotipy>=2.25.2",
-    "streamlit>=1.52.2",
-    "loguru>=0.7.3",
-    "pydantic>=2.12.4",
-    "pydantic-settings>=2.12",
-    "dependency-injector>=4.48.3",
-    "chromadb>=1.4.0",
-    "openai>=2.14.0",
-    "ollama>=0.6.1",
+  "lyricsgenius>=3.7.5",
+  "python-dotenv>=1.2.1",
+  "spotipy>=2.25.2",
+  "streamlit>=1.52.2",
+  "loguru>=0.7.3",
+  "pydantic>=2.12.4",
+  "pydantic-settings>=2.12",
+  "dependency-injector>=4.48.3",
+  "chromadb>=1.4.0",
+  "openai>=2.14.0",
+  "ollama>=0.6.1",
+  "stamina>=25.2.0",
 ]
 
 
 [project.urls]
-repository = "https://github.com/matiagimenez/spotify-vibe-searcher"
+repository = "https://github.com/justmatias/spotify-vibe-searcher"
 
 [tool.setuptools]
 packages = ["spotify_vibe_searcher"]
@@ -41,11 +42,10 @@ dev = [
   "pytest-cov>=7.0.0",
   "pytest-recording>=0.13.4",
   "polyfactory>=2.14.0",
+  "pytest-sugar>=1.1.1",
 ]
 
-build = [
-  "build>=1.0",
-]
+build = ["build>=1.0"]
 
 ##################################
 # ruff configuration             #
@@ -112,7 +112,8 @@ load-plugins = [
   "pylint.extensions.set_membership",
 ]
 
-
+[tool.pylint.format]
+max-line-length = 120
 
 
 ##################################
@@ -126,8 +127,7 @@ show_error_codes = true
 no_implicit_optional = true
 warn_return_any = true
 warn_unused_ignores = true
-disable_error_code = [ "var-annotated" ]
-
+disable_error_code = ["var-annotated"]
 
 
 ##################################
@@ -148,7 +148,6 @@ build = "pip install -e ."
 test = "pytest --cov=spotify_vibe_searcher --cov-report=term-missing:skip-covered"
 
 
-
 ##################################
 # semantic release configuration #
 ##################################
@@ -156,7 +155,7 @@ test = "pytest --cov=spotify_vibe_searcher --cov-report=term-missing:skip-covere
 [tool.semantic_release]
 branch = "main"
 commit_message = "chore(release): release version {version}"
-version_variables = [ "spotify_vibe_searcher/__init__.py:__version__" ]
+version_variables = ["spotify_vibe_searcher/__init__.py:__version__"]
 
 [tool.semantic_release.branches.main]
 match = "(main|master)"
@@ -181,13 +180,13 @@ trim_blocks = false
 lstrip_blocks = false
 newline_sequence = "\n"
 keep_trailing_newline = false
-extensions = [  ]
+extensions = []
 autoescape = true
 
 [tool.semantic_release.commit_parser_options]
-allowed_tags = [ "chore", "docs", "feat", "fix", "refactor" ]
-minor_tags = [ "feat" ]
-patch_tags = [ "fix", "perf" ]
+allowed_tags = ["chore", "docs", "feat", "fix", "refactor"]
+minor_tags = ["feat"]
+patch_tags = ["fix", "perf"]
 default_bump_level = 0
 
 [tool.semantic_release.remote]

@@ -100,7 +100,7 @@ A **LLM-powered search engine** application that lets you search your Spotify "L
 1. **Clone the repository**
 
    ```bash
-   git clone https://github.com/matiagimenez/spotify-vibe-searcher.git
+   git clone https://github.com/justmatias/spotify-vibe-searcher.git
    cd spotify-vibe-searcher
    ```
 

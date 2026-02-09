@@ -17,7 +17,7 @@ def llm_client_with_api_error() -> LLMClient:
 
     mock_client = MagicMock()
     mock_client.chat.completions.create.side_effect = Exception("API Error")
-    llm_client._client = mock_client
+    llm_client.__dict__["client"] = mock_client
 
     return llm_client
 

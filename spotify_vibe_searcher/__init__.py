@@ -1,3 +1,3 @@
 from importlib.metadata import version
 
-__version__ = version("spotify-rag")
+__version__ = version("spotify-vibe-searcher")
