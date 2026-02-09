@@ -16,8 +16,6 @@ from .track_analysis import TrackAnalysisService
 
 
 class LibrarySyncService(BaseModel):
-    """Service to orchestrate fetching tracks and enriching with lyrics."""
-
     spotify_client: SpotifyClient
     genius_client: GeniusClient
     track_analysis_service: TrackAnalysisService
@@ -62,11 +60,17 @@ class LibrarySyncService(BaseModel):
                 )
                 continue
 
-            enriched_track = self.enrich_track(saved_track)
-            if enriched_track.vibe_description:
-                self.vectordb_repository.add_track(enriched_track)
-
-            yield enriched_track
+            try:
+                enriched_track = self.enrich_track(saved_track)
+                if enriched_track.vibe_description:
+                    self.vectordb_repository.add_track(enriched_track)
+                yield enriched_track
+            except Exception as e:
+                log(
+                    f"Failed to enrich '{song_title}' by {artist_name}: {e}",
+                    LogLevel.WARNING,
+                )
+                continue
 
         log("Library sync completed.", LogLevel.INFO)
 
