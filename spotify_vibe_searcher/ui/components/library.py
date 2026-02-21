@@ -22,67 +22,68 @@ def render_library_section() -> None:
             st.rerun()
 
     with col3:
-        if count > 0:
-            if st.button("🗑️ Clear Database", key="clear_library", type="secondary"):
-                with st.spinner("Clearing database..."):
-                    all_data = repository.get_all_tracks()
-                    track_ids = all_data.get("ids", [])
-                    if track_ids:
-                        repository.delete_tracks(track_ids)
-                        st.success(f"✅ Deleted {len(track_ids)} tracks from database!")
-                        st.rerun()
+        if count > 0 and st.button(
+            "🗑️ Clear Database", key="clear_library", type="secondary"
+        ):
+            with st.spinner("Clearing database..."):
+                all_data = repository.get_all_tracks()
+                track_ids = all_data.get("ids", [])
+                if track_ids:
+                    repository.delete_tracks(track_ids)
+                    st.success(f"✅ Deleted {len(track_ids)} tracks from database!")
+                    st.rerun()
 
     if count > 0:
-        with st.expander("View All Tracks", expanded=True):
-            with st.spinner("Loading tracks..."):
-                data = repository.get_all_tracks()
+        with (
+            st.expander("View All Tracks", expanded=True),
+            st.spinner("Loading tracks..."),
+        ):
+            data = repository.get_all_tracks()
 
-                if not data or not data["ids"]:
-                    st.info("No tracks found.")
-                    return
+            if not data or not data["ids"]:
+                st.info("No tracks found.")
+                return
 
-                # Parse data into a format suitable for DataFrame
-                rows = []
-                ids = data["ids"]
-                # metadatas and documents might be None if empty, but count > 0 so likely not.
-                # chroma returns lists.
-                metadatas = data["metadatas"] or []
-                documents = data["documents"] or []
+            # Parse data into a format suitable for DataFrame
+            rows = []
+            ids = data["ids"]
+            # metadatas and documents might be None if empty, but count > 0 so likely not.
+            # chroma returns lists.
+            metadatas = data.get("metadatas") or []
+            documents = data.get("documents") or []
 
-                for i, _ in enumerate(ids):
-                    # safely get metadata and document
-                    meta = metadatas[i] if i < len(metadatas) else {}
-                    doc = documents[i] if i < len(documents) else ""
+        for i, _ in enumerate(ids):
+            # safely get metadata and document
+            meta = metadatas[i] if i < len(metadatas) else {}
+            doc = documents[i] if i < len(documents) else ""
 
-                    rows.append({
-                        "Track": meta.get("track_name", "Unknown"),
-                        "Artist": meta.get("artist_names", "Unknown"),
-                        "Album": meta.get("album_name", "Unknown"),
-                        "Vibe": doc,
-                        "Genres": meta.get("genres", ""),
-                        "Popularity": meta.get("popularity", 0),
-                        "Spotify URL": meta.get("spotify_url", ""),
-                    })
+            rows.append({
+                "Track": meta.get("track_name", "Unknown"),
+                "Artist": meta.get("artist_names", "Unknown"),
+                "Album": meta.get("album_name", "Unknown"),
+                "Vibe": doc,
+                "Genres": meta.get("genres", ""),
+                "Popularity": meta.get("popularity", 0),
+                "Spotify URL": meta.get("spotify_url", ""),
+            })
 
-                df = pd.DataFrame(rows)
+        df = pd.DataFrame(rows)
 
-                st.dataframe(
-                    df,
-                    column_config={
-                        "Spotify URL": st.column_config.LinkColumn("Link"),
-                        "Vibe": st.column_config.TextColumn(
-                            "Vibe Description", width="large"
-                        ),
-                        "Popularity": st.column_config.ProgressColumn(
-                            "Popularity",
-                            help="Track popularity on Spotify",
-                            format="%d",
-                            min_value=0,
-                            max_value=100,
-                        ),
-                    },
-                    width="stretch",
-                    hide_index=True,
-                )
+        st.dataframe(
+            df,
+            column_config={
+                "Spotify URL": st.column_config.LinkColumn("Link"),
+                "Vibe": st.column_config.TextColumn("Vibe Description", width="large"),
+                "Popularity": st.column_config.ProgressColumn(
+                    "Popularity",
+                    help="Track popularity on Spotify",
+                    format="%d",
+                    min_value=0,
+                    max_value=100,
+                ),
+            },
+            width="stretch",
+            hide_index=True,
+        )
     else:
         st.info("Your knowledge base is empty. Sync your library to add tracks!")

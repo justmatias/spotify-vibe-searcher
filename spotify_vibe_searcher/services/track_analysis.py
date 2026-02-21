@@ -1,4 +1,4 @@
-"""Track analysis service using LLM."""
+import contextlib
 
 from pydantic import BaseModel
 
@@ -15,7 +15,7 @@ class TrackAnalysisService(BaseModel):
         for artist in saved_track.track.artists:
             genres.extend(artist.genres)
 
-        prompt = f"""
+        return f"""
         Act as an expert music critic. Analyze this song:
             - **Title:** {saved_track.track.name}
             - **Artist:** {saved_track.track.artist_names}
@@ -36,10 +36,9 @@ class TrackAnalysisService(BaseModel):
 
             Vibe Description:
         """
-        return prompt
 
     async def analyze_track(self, saved_track: SavedTrack, lyrics: str) -> str | None:
-        try:
+        with contextlib.suppress(Exception):
             prompt = self._build_analysis_prompt(saved_track, lyrics)
             log(f"Prompt: {prompt}", LogLevel.DEBUG)
             vibe_description = await self.llm_client.generate(prompt)
@@ -48,6 +47,8 @@ class TrackAnalysisService(BaseModel):
                 LogLevel.INFO,
             )
             return vibe_description
-        except Exception as e:
-            log(f"Error analyzing track {saved_track.track.name}: {e}", LogLevel.ERROR)
-            return None
+        log(
+            f"Failed to generate vibe description for: {saved_track.track.name}",
+            LogLevel.WARNING,
+        )
+        return None

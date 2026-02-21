@@ -136,7 +136,7 @@ def app() -> None:
         # Ensure cache directory exists
         Settings.CACHE_PATH.mkdir(parents=True, exist_ok=True)
 
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001
         render_sidebar()
         render_hero_section()
         st.error(f"⚠️ Configuration Error: {e!s}")

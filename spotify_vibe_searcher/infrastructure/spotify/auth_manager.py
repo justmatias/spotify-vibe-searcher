@@ -3,7 +3,7 @@ from typing import Any
 
 import stamina
 from pydantic import BaseModel
-from spotipy.oauth2 import CacheFileHandler, SpotifyOAuth
+from spotipy.oauth2 import CacheFileHandler, SpotifyOAuth, SpotifyOauthError
 
 from spotify_vibe_searcher.utils import LogLevel, Settings, log
 
@@ -33,7 +33,7 @@ class SpotifyAuthManager(BaseModel):
     def get_access_token(self, code: str) -> dict[str, Any] | None:
         try:
             return self.oauth.get_access_token(code, as_dict=True)  # type: ignore[no-any-return]
-        except Exception as e:
+        except SpotifyOauthError as e:
             log(f"Failed to get access token: {e}", LogLevel.WARNING)
             return None
 
@@ -47,6 +47,6 @@ class SpotifyAuthManager(BaseModel):
     def refresh_token(self, refresh_token: str) -> dict[str, Any] | None:
         try:
             return self.oauth.refresh_access_token(refresh_token)  # type: ignore[no-any-return]
-        except Exception as e:
+        except SpotifyOauthError as e:
             log(f"Failed to refresh token: {e}", LogLevel.WARNING)
             return None
