@@ -1,3 +1,5 @@
+import asyncio
+
 import streamlit as st
 
 from spotify_vibe_searcher.domain import SearchResults
@@ -37,7 +39,9 @@ def render_search_section() -> None:
                 search_service = container.services.search_service()
 
                 # Perform semantic search
-                results = search_service.search_by_vibe(query, n_results=n_results)
+                results = asyncio.run(
+                    search_service.search_by_vibe(query, n_results=n_results)
+                )
 
                 # Display results
                 _render_search_results(results)

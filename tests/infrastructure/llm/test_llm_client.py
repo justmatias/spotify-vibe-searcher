@@ -11,28 +11,36 @@ def test_client_reuses_instance(llm_client: LLMClient) -> None:
 
 
 @pytest.mark.vcr
-def test_generate_simple_prompt(llm_client: LLMClient, simple_prompt: str) -> None:
-    response = llm_client.generate(simple_prompt)
+@pytest.mark.asyncio
+async def test_generate_simple_prompt(
+    llm_client: LLMClient, simple_prompt: str
+) -> None:
+    response = await llm_client.generate(simple_prompt)
     assert isinstance(response, str)
     assert response == "Paris."
 
 
 @pytest.mark.vcr
-def test_generate_analysis_prompt(llm_client: LLMClient, analysis_prompt: str) -> None:
-    response = llm_client.generate(analysis_prompt)
+@pytest.mark.asyncio
+async def test_generate_analysis_prompt(
+    llm_client: LLMClient, analysis_prompt: str
+) -> None:
+    response = await llm_client.generate(analysis_prompt)
 
     assert isinstance(response, str)
     assert len(response) > 0
 
 
 @pytest.mark.vcr
-def test_generate_returns_stripped_content(llm_client: LLMClient) -> None:
-    response = llm_client.generate("Say hello")
+@pytest.mark.asyncio
+async def test_generate_returns_stripped_content(llm_client: LLMClient) -> None:
+    response = await llm_client.generate("Say hello")
     assert not response.startswith(" ")
     assert not response.endswith(" ")
 
 
-def test_generate_handles_api_error(llm_client_with_api_error: LLMClient) -> None:
+@pytest.mark.asyncio
+async def test_generate_handles_api_error(llm_client_with_api_error: LLMClient) -> None:
     """Test that generate properly wraps API errors."""
     with pytest.raises(RuntimeError, match="Failed to generate text"):
-        llm_client_with_api_error.generate("test prompt")
+        await llm_client_with_api_error.generate("test prompt")

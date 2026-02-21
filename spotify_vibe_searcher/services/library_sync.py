@@ -1,6 +1,8 @@
 """Library sync service for fetching and enriching Spotify tracks."""
 
+import asyncio
 from collections.abc import Generator
+from itertools import batched
 
 from pydantic import BaseModel
 
@@ -10,6 +12,7 @@ from spotify_vibe_searcher.infrastructure import (
     SpotifyClient,
     VectorDBRepository,
 )
+from spotify_vibe_searcher.utils import Settings
 from spotify_vibe_searcher.utils.logger import LogLevel, log
 
 from .track_analysis import TrackAnalysisService
@@ -31,43 +34,66 @@ class LibrarySyncService(BaseModel):
         total = len(saved_tracks)
         log(f"Found {total} tracks to process.", LogLevel.INFO)
 
-        for index, saved_track in enumerate(saved_tracks, start=1):
-            yield SyncProgress(
-                current=index,
-                total=total,
-                song_title=saved_track.track.name,
-                artist_name=saved_track.track.artist_names,
+        current_index = 1
+        for batch in batched(saved_tracks, Settings.LLM_CONCURRENCY_LIMIT):
+            batch_tracks_for_processing = []
+
+            for track in batch:
+                yield SyncProgress(
+                    current=current_index,
+                    total=total,
+                    song_title=track.track.name,
+                    artist_name=track.track.artist_names,
+                )
+                current_index += 1
+                batch_tracks_for_processing.append(track)
+
+            enriched_tracks = asyncio.run(
+                self._process_track_batch(batch_tracks_for_processing)
             )
-            yield from self._process_track(saved_track)
+            yield from enriched_tracks
 
         log("Library sync completed.", LogLevel.INFO)
 
-    def _process_track(
+    async def _process_track_batch(
+        self, tracks: list[SavedTrack]
+    ) -> list[EnrichedTrack]:
+        tasks = [self._process_single_track(track) for track in tracks]
+        results = await asyncio.gather(*tasks, return_exceptions=False)
+        # Filter out Nones
+        return [result for result in results if result is not None]
+
+    async def _process_single_track(
         self, saved_track: SavedTrack
-    ) -> Generator[EnrichedTrack, None, None]:
+    ) -> EnrichedTrack | None:
         track = saved_track.track
-        if self.vectordb_repository.track_exists(track.id_):
+        exists = await asyncio.to_thread(
+            self.vectordb_repository.track_exists, track.id_
+        )
+        if exists:
             log(f"Skipping '{track.name}' - already indexed.", LogLevel.DEBUG)
-            return
+            return None
 
         try:
-            enriched = self._enrich_track(saved_track)
+            enriched = await self._enrich_track(saved_track)
             if enriched.vibe_description:
-                self.vectordb_repository.add_track(enriched)
-            yield enriched
+                await asyncio.to_thread(self.vectordb_repository.add_track, enriched)
+            return enriched
         except Exception as e:  # pragma: no cover
             log(f"Failed to enrich '{track.name}': {e}", LogLevel.WARNING)
+            return None
 
-    def _enrich_track(self, saved_track: SavedTrack) -> EnrichedTrack:
-        """Enrich a track with lyrics and vibe description."""
-        lyrics = self.genius_client.search_song(
+    async def _enrich_track(self, saved_track: SavedTrack) -> EnrichedTrack:
+        """Enrich a track with lyrics and vibe description asynchronously."""
+        lyrics = await asyncio.to_thread(
+            self.genius_client.search_song,
             title=saved_track.track.name,
             artist=saved_track.track.artist_names,
         )
         vibe_description = None
 
         if lyrics:
-            vibe_description = self.track_analysis_service.analyze_track(
+            vibe_description = await self.track_analysis_service.analyze_track(
                 saved_track=saved_track,
                 lyrics=lyrics,
             )

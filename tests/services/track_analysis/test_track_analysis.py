@@ -5,12 +5,15 @@ from spotify_vibe_searcher.services import TrackAnalysisService
 
 
 @pytest.mark.vcr
-def test_analyze_track_success(
+@pytest.mark.asyncio
+async def test_analyze_track_success(
     track_analysis_service: TrackAnalysisService,
     sample_saved_track: SavedTrack,
     sample_lyrics: str,
 ) -> None:
-    result = track_analysis_service.analyze_track(sample_saved_track, sample_lyrics)
+    result = await track_analysis_service.analyze_track(
+        sample_saved_track, sample_lyrics
+    )
 
     assert result
     assert isinstance(result, str)
@@ -37,11 +40,14 @@ def test_analyze_track_builds_correct_prompt(
 
 
 @pytest.mark.usefixtures("mock_llm_exception")
-def test_analyze_track_handles_exceptions(
+@pytest.mark.asyncio
+async def test_analyze_track_handles_exceptions(
     track_analysis_service: TrackAnalysisService,
     sample_saved_track: SavedTrack,
     simple_lyrics: str,
 ) -> None:
-    result = track_analysis_service.analyze_track(sample_saved_track, simple_lyrics)
+    result = await track_analysis_service.analyze_track(
+        sample_saved_track, simple_lyrics
+    )
 
     assert result is None

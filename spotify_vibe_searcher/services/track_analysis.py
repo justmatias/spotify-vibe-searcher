@@ -38,11 +38,11 @@ class TrackAnalysisService(BaseModel):
         """
         return prompt
 
-    def analyze_track(self, saved_track: SavedTrack, lyrics: str) -> str | None:
+    async def analyze_track(self, saved_track: SavedTrack, lyrics: str) -> str | None:
         try:
             prompt = self._build_analysis_prompt(saved_track, lyrics)
             log(f"Prompt: {prompt}", LogLevel.DEBUG)
-            vibe_description = self.llm_client.generate(prompt)
+            vibe_description = await self.llm_client.generate(prompt)
             log(
                 f"Generated vibe description for: {saved_track.track.name}",
                 LogLevel.INFO,
