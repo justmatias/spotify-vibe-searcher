@@ -206,9 +206,6 @@ Since Genius is slow, the UI is critical.
 - [ ] **Dark Mode Toggle**: Add theme switcher in sidebar.
   - **Files:** `ui/config.py`, `ui/styles/main.css`
 
-- [ ] **Keyboard Shortcuts**: Add keyboard navigation for search results.
-  - **Files:** `ui/components/search.py`
-
 - [ ] **Export Search Results**: Download search results as JSON/CSV.
   - **Files:** `ui/components/search.py`
 
