@@ -13,30 +13,34 @@ This project builds a semantic search engine for your Spotify "Liked Songs" libr
 ## 🛠 Tech Stack
 
 ### Core
+
 - **Language:** Python 3.12+
 - **Package Manager:** `uv`
 - **Validation:** `Pydantic` (v2)
 - **Dependency Injection:** `dependency-injector`
 
 ### AI & Vector Search
+
 - **LLM:** `Ollama` (Llama 3.2 / Mistral) via OpenAI-compatible API
 - **Embeddings:** `nomic-embed-text` (Ollama)
 - **Vector Database:** `ChromaDB` (Local, persistent)
-  - *Planned:* Migration to `LightRAG` for graph-based knowledge representation
+  - _Planned:_ Migration to `LightRAG` for graph-based knowledge representation
 
 ### Data Sources
+
 - **Spotify:** `spotipy` (Spotify Web API)
 - **Lyrics:** `lyricsgenius` (Genius API wrapper)
 
 ### Frontend
+
 - **Framework:** `Streamlit`
 - **Styling:** Custom CSS
 
 ### Development
+
 - **Testing:** `pytest`, `pytest-vcr`, `polyfactory`
 - **Linting:** `ruff`, `pylint`, `mypy`
 - **Tasks:** `poethepoet`
-
 
 ---
 
@@ -48,12 +52,10 @@ You now need keys for two different kingdoms.
 
 1. **Spotify App:** Get your `CLIENT_ID` and `CLIENT_SECRET` from the Spotify Developer Dashboard.
 2. **Genius API:**
-
    - Go to [Genius API Clients](https://genius.com/api-clients).
    - Create an app to generate your `GENIUS_ACCESS_TOKEN`.
 
 3. **Environment Setup:**
-
    - Create a `.env` file:
 
    ```ini
@@ -69,12 +71,10 @@ You now need keys for two different kingdoms.
 This is where the slow magic happens. Downloading lyrics takes longer than fetching metadata.
 
 1. **Fetch Spotify Data:**
-
    - Get the user's `Saved Tracks`.
    - Get the Artist's Genres (via Batch API call).
 
 2. **Fetch Genius Data (New Step):**
-
    - Initialize: `genius = lyricsgenius.Genius(token)`.
    - **Search Strategy:** Iterate through the tracks.
    - _Sanitization:_ Clean the title before searching (remove "Remastered 2009", "- Live", etc.) to improve hit rate.
@@ -86,11 +86,11 @@ This is where the slow magic happens. Downloading lyrics takes longer than fetch
 The prompt is now much more sophisticated to leverage the textual data.
 
 1. **Inference Logic:**
-
    - Function: `analyze_track_deeply(metadata, lyrics_text)`.
    - **Truncation:** Lyrics can be long. Truncate to the first 1000-1500 characters to save tokens; the chorus and main theme are usually found there.
 
 2. **The Master Prompt:**
+
    > "Act as an expert music critic. Analyze this song:
 
    > - **Title:** {title}
@@ -128,20 +128,15 @@ The search flow remains, but the "DJ" response will be smarter.
 Since Genius is slow, the UI is critical.
 
 1. **Real Progress Bar:**
-
    - In Streamlit, use `my_bar = st.progress(0)`.
    - Update the bar for each processed song (Spotify + Genius + OpenAI).
 
 2. **Limit Control:**
-
    - Add a `slider` in the UI: _"How many recent songs to analyze?"_ (Default: 20, Max: 100).
    - _Warning:_ "Analyzing lyrics takes time (approx 2-3 seconds per song)."
 
 3. **Display:**
-
    - Show the song card, and if lyrics were found, add a small _expander_ labeled "See AI Analysis" to show the generated explanation.
-
-
 
 ## 🚀 Definition of Done
 
@@ -177,19 +172,18 @@ Since Genius is slow, the UI is critical.
   - **Files:** `services/library_sync.py`
   - **Implementation:** Wrapped track enrichment in try/except, logs warning and continues.
 
-
 ### 7.2 Performance Optimizations
 
-- [ ] **Async Batching for LLM Inference**: Process multiple tracks concurrently for faster sync.
+- [x] **Async Batching for LLM Inference**: Process multiple tracks concurrently for faster sync.
   - **Files:** `services/track_analysis.py`, `infrastructure/llm/client.py`
   - **Implementation:** Use `asyncio` with configurable concurrency limit (default 3).
 
-- [ ] **Batch Embedding Generation**: Generate embeddings in batches instead of one-by-one.
+- [x] **Batch Embedding Generation**: Generate embeddings in batches instead of one-by-one.
   - **Files:** `infrastructure/vectordb/repository.py`
   - **Current:** Uses Ollama's embedding function per-document.
   - **Improvement:** Batch up to 10 documents per embedding call.
 
-- [ ] **Connection Pooling**: Reuse HTTP connections for external APIs.
+- [x] **Connection Pooling**: Reuse HTTP connections for external APIs.
   - **Files:** `infrastructure/genius/client.py`, `infrastructure/llm/client.py`
   - **Implementation:** Use `httpx` with persistent sessions.
 
@@ -226,14 +220,14 @@ Since Genius is slow, the UI is critical.
 
 ### Why LightRAG instead of ChromaDB?
 
-| Aspect | ChromaDB (Current) | LightRAG (Proposed) |
-|--------|-------------------|---------------------|
-| **Knowledge Model** | Flat vector embeddings | Graph-based entities + relationships |
-| **User Relationships** | Not supported | Natural fit for user-to-user connections |
-| **Cross-Library Queries** | Requires manual joins | Graph traversal handles naturally |
-| **Artist/Genre Connections** | Metadata only | Explicit entity relationships |
-| **Retrieval** | Vector similarity only | Dual-level (graph + vector) |
-| **Query Modes** | Single mode | Naive, Local, Global, Hybrid |
+| Aspect                       | ChromaDB (Current)     | LightRAG (Proposed)                      |
+| ---------------------------- | ---------------------- | ---------------------------------------- |
+| **Knowledge Model**          | Flat vector embeddings | Graph-based entities + relationships     |
+| **User Relationships**       | Not supported          | Natural fit for user-to-user connections |
+| **Cross-Library Queries**    | Requires manual joins  | Graph traversal handles naturally        |
+| **Artist/Genre Connections** | Metadata only          | Explicit entity relationships            |
+| **Retrieval**                | Vector similarity only | Dual-level (graph + vector)              |
+| **Query Modes**              | Single mode            | Naive, Local, Global, Hybrid             |
 
 **Recommendation:** Migrate to LightRAG for enhanced relationship modeling while maintaining vector search capabilities.
 
@@ -473,6 +467,7 @@ Since we're moving from ChromaDB to LightRAG:
 ### Automated Tests
 
 #### Existing Tests to Leverage
+
 - `tests/services/search/test_search.py` - Adapt for LightRAG queries
 - `tests/infrastructure/vectordb/test_vectordb_repository.py` - Create parallel LightRAG tests
 - `tests/services/library_sync/test_library_sync.py` - Extend for friend library sync
@@ -489,6 +484,7 @@ uv run pytest tests/infrastructure/lightrag/ -v
 ```
 
 **Test files to create:**
+
 - `tests/infrastructure/lightrag/test_lightrag_client.py`
 - `tests/services/user_comparison/test_user_comparison.py`
 - `tests/domain/user_comparison/test_user_profile.py`
@@ -522,6 +518,7 @@ uv run pytest tests/infrastructure/lightrag/ -v
 ### Why ReAct Agent?
 
 The ReAct (Reasoning + Acting) pattern allows the agent to:
+
 1. **Reason** about user intent from natural language
 2. **Act** by calling appropriate tools
 3. **Observe** results and decide next steps
@@ -589,9 +586,11 @@ Agent: "Done! Created 'Rainy Day Nostalgia' with 8 tracks.
 ### 9.3 Implementation Details
 
 #### [NEW] `infrastructure/agent/tools.py`
+
 Define tool wrappers that integrate with existing services.
 
 #### [NEW] `infrastructure/agent/agent.py`
+
 ```python
 class MusicDJAgent:
     """ReAct agent for conversational music interaction."""
@@ -611,9 +610,11 @@ class MusicDJAgent:
 ```
 
 #### [NEW] `ui/components/chat.py`
+
 Chat interface component for agent interaction.
 
 #### [MODIFY] `ui/app.py`
+
 Add "Chat with DJ" tab/section for agent interaction.
 
 ---
@@ -623,12 +624,14 @@ Add "Chat with DJ" tab/section for agent interaction.
 > **Goal:** Fine-tune music understanding to individual user preferences.
 
 ### Features
+
 - [ ] Train LoRA adapter on user's vibe descriptions and feedback
 - [ ] Learn user's genre preferences and emotional associations
 - [ ] Improve search relevance based on user history
 - [ ] "Teach" the model new vibes: "When I say 'coding music' I mean..."
 
 ### Implementation
+
 - Export user's library + vibe descriptions as training data
 - Fine-tune small adapter (e.g., 7B parameter model)
 - A/B test personalized vs generic model responses
@@ -640,11 +643,13 @@ Add "Chat with DJ" tab/section for agent interaction.
 > **Goal:** Enable natural voice commands and image-based music discovery.
 
 ### 11.1 Voice Search
+
 - [ ] Integrate Whisper (local) for speech-to-text
 - [ ] Voice command: "Hey DJ, play something for a rainy Sunday"
 - [ ] Voice feedback: "Not this vibe, something more upbeat"
 
 ### 11.2 Multi-Modal Input
+
 - [ ] Accept image uploads (sunset photo, party scene, etc.)
 - [ ] Use vision model (LLaVA/GPT-4V) to describe image mood
 - [ ] Convert visual vibe to music search query
@@ -657,6 +662,7 @@ Add "Chat with DJ" tab/section for agent interaction.
 > **Goal:** Make music discovery a social experience.
 
 ### Features
+
 - [ ] **Share Results**: Generate shareable cards for similarity comparisons
 - [ ] **Taste Challenges**: "Can you guess which song I like more?"
 - [ ] **Group Playlists**: Collaborative playlist that satisfies multiple users

@@ -27,7 +27,7 @@ class GeniusClient(BaseModel):
 
         try:
             lyrics = self._fetch_lyrics(clean_title, artist)
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001
             log(
                 f"Failed to fetch lyrics for '{clean_title}' after retries: {e}",
                 LogLevel.WARNING,

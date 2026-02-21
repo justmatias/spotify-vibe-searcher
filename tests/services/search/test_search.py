@@ -5,12 +5,13 @@ from spotify_vibe_searcher.services import SearchService
 
 
 @pytest.mark.vcr
+@pytest.mark.asyncio
 @pytest.mark.usefixtures("_populate_search_tracks")
-def test_search_by_vibe_returns_search_results_domain_model(
+async def test_search_by_vibe_returns_search_results_domain_model(
     search_service: SearchService,
     sample_query: str,
 ) -> None:
-    result = search_service.search_by_vibe(sample_query, n_results=10)
+    result = await search_service.search_by_vibe(sample_query, n_results=10)
 
     assert isinstance(result, SearchResults)
     assert result.query == sample_query
@@ -18,21 +19,23 @@ def test_search_by_vibe_returns_search_results_domain_model(
 
 
 @pytest.mark.vcr
+@pytest.mark.asyncio
 @pytest.mark.usefixtures("_populate_search_tracks")
-def test_similarity_score_conversion_from_distance(
+async def test_similarity_score_conversion_from_distance(
     search_service: SearchService,
 ) -> None:
-    result = search_service.search_by_vibe("test query", n_results=10)
+    result = await search_service.search_by_vibe("test query", n_results=10)
 
     for search_result in result.results:
         assert 0.0 <= search_result.similarity_score <= 1.0
 
 
 @pytest.mark.vcr
-def test_empty_results_returns_valid_domain_model(
+@pytest.mark.asyncio
+async def test_empty_results_returns_valid_domain_model(
     search_service: SearchService,
 ) -> None:
-    result = search_service.search_by_vibe("nonexistent vibe", n_results=10)
+    result = await search_service.search_by_vibe("nonexistent vibe", n_results=10)
 
     assert isinstance(result, SearchResults)
     assert result.total_results == 0

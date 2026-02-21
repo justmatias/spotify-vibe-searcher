@@ -72,6 +72,10 @@ class AppSettings(BaseSettings):
         default=0.7,
         description="Temperature for LLM generation",
     )
+    LLM_CONCURRENCY_LIMIT: int = Field(
+        default=3,
+        description="Maximum number of concurrent LLM requests during library sync",
+    )
 
     @property
     def CHROMADB_PATH(self) -> Path:

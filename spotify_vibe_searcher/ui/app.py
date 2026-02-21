@@ -19,7 +19,6 @@ from .components import (
     render_search_section,
     render_sidebar,
     render_sync_library_section,
-    render_user_profile,
 )
 from .config import (
     configure_page,
@@ -71,50 +70,23 @@ def check_cached_token(auth_manager: SpotifyAuthManager) -> None:
 
 
 def render_authenticated_view(user: SpotifyUser) -> None:
-    """Render the view for authenticated users."""
-    _, col2, _ = st.columns([1, 2, 1])
-    with col2:
-        render_user_profile(user)
+    """Render the authenticated dashboard — full width."""
+    # ── Search (always visible, on top) ────────────────────
+    render_search_section()
 
-        st.markdown("### 🚀 What's Next?")
+    st.markdown('<hr class="section-divider">', unsafe_allow_html=True)
 
-        track_limit = st.slider(
-            "How many recent songs to analyze?",
-            min_value=5,
-            max_value=100,
-            value=20,
-            step=5,
-        )
-        st.caption("⚠️ Analyzing lyrics takes time (approx 2-3 seconds per song).")
+    # ── Sync ────────────────────────────────────────────────
+    st.markdown("#### 📥 Sync Library")
+    st.caption("⚠️ Analyzing lyrics takes time (~2-3 sec per song).")
 
-        col_a, col_b = st.columns(2)
-        with col_a:
-            render_sync_library_section(
-                access_token=st.session_state.access_token,
-                track_limit=track_limit,
-            )
+    render_sync_library_section(
+        access_token=st.session_state.access_token,
+    )
 
-        with col_b:
-            render_search_section()
-
-        st.markdown("---")
-
-        render_library_section()
-
-        st.markdown("---")
-
-        if st.button("🚪 Disconnect", width="stretch"):
-            # Clear session and cached token
-            st.session_state.authenticated = False
-            st.session_state.access_token = None
-            st.session_state.user = None
-
-            # Remove cached token file
-            cache_file = Settings.CACHE_PATH / ".spotify_cache"
-            if cache_file.exists():
-                cache_file.unlink()
-
-            st.rerun()
+    # ── Library / Knowledge Base ────────────────────────────
+    st.markdown('<hr class="section-divider">', unsafe_allow_html=True)
+    render_library_section()
 
 
 def render_unauthenticated_view(auth_manager: SpotifyAuthManager) -> None:
@@ -136,10 +108,10 @@ def app() -> None:
         # Ensure cache directory exists
         Settings.CACHE_PATH.mkdir(parents=True, exist_ok=True)
 
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001
         render_sidebar()
         render_hero_section()
-        st.error(f"⚠️ Configuration Error: {str(e)}")
+        st.error(f"⚠️ Configuration Error: {e!s}")
         st.info(
             """
             **Setup Required:**
@@ -151,8 +123,6 @@ def app() -> None:
         render_features()
         return
 
-    render_sidebar()
-
     # Handle OAuth callback
     code = handle_oauth_callback()
     if code and not st.session_state.authenticated:
@@ -162,9 +132,13 @@ def app() -> None:
     if not st.session_state.authenticated:
         check_cached_token(auth_manager)
 
+    # Render sidebar (pass user if authenticated)
+    user = st.session_state.user if st.session_state.authenticated else None
+    render_sidebar(user)
+
     # Main content
-    if st.session_state.authenticated and st.session_state.user:
-        render_authenticated_view(st.session_state.user)
+    if st.session_state.authenticated and user:
+        render_authenticated_view(user)
     else:
         render_unauthenticated_view(auth_manager)
 

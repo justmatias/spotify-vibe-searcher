@@ -1,7 +1,8 @@
-from typing import Generator
+from collections.abc import Generator
 from unittest.mock import MagicMock, patch
 
 import pytest
+from spotipy.oauth2 import SpotifyOauthError
 
 from spotify_vibe_searcher.infrastructure.spotify.auth_manager import SpotifyAuthManager
 
@@ -39,7 +40,7 @@ def setup_get_access_token_success(mock_oauth_instance: MagicMock) -> None:
 
 @pytest.fixture
 def setup_get_access_token_failure(mock_oauth_instance: MagicMock) -> None:
-    mock_oauth_instance.get_access_token.side_effect = Exception("Error")
+    mock_oauth_instance.get_access_token.side_effect = SpotifyOauthError("Error")
 
 
 @pytest.fixture
@@ -50,7 +51,7 @@ def setup_refresh_token_success(mock_oauth_instance: MagicMock) -> None:
 
 @pytest.fixture
 def setup_refresh_token_failure(mock_oauth_instance: MagicMock) -> None:
-    mock_oauth_instance.refresh_access_token.side_effect = Exception("Error")
+    mock_oauth_instance.refresh_access_token.side_effect = SpotifyOauthError("Error")
 
 
 @pytest.fixture

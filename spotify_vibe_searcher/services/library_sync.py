@@ -1,5 +1,6 @@
 """Library sync service for fetching and enriching Spotify tracks."""
 
+import asyncio
 from collections.abc import Generator
 
 from pydantic import BaseModel
@@ -55,7 +56,7 @@ class LibrarySyncService(BaseModel):
             if enriched.vibe_description:
                 self.vectordb_repository.add_track(enriched)
             yield enriched
-        except Exception as e:  # pragma: no cover
+        except Exception as e:  # pragma: no cover  # noqa: BLE001
             log(f"Failed to enrich '{track.name}': {e}", LogLevel.WARNING)
 
     def _enrich_track(self, saved_track: SavedTrack) -> EnrichedTrack:
@@ -67,9 +68,11 @@ class LibrarySyncService(BaseModel):
         vibe_description = None
 
         if lyrics:
-            vibe_description = self.track_analysis_service.analyze_track(
-                saved_track=saved_track,
-                lyrics=lyrics,
+            vibe_description = asyncio.run(
+                self.track_analysis_service.analyze_track(
+                    saved_track=saved_track,
+                    lyrics=lyrics,
+                )
             )
 
         return EnrichedTrack(

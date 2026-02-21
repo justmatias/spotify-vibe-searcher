@@ -1,3 +1,5 @@
+import asyncio
+
 from pydantic import BaseModel
 
 from spotify_vibe_searcher.domain import SearchResult, SearchResults
@@ -9,7 +11,7 @@ class SearchService(BaseModel):
     vectordb_repository: VectorDBRepository
     llm_client: LLMClient
 
-    def search_by_vibe(self, query: str, n_results: int = 10) -> SearchResults:
+    async def search_by_vibe(self, query: str, n_results: int = 10) -> SearchResults:
         """Search for tracks by vibe description using semantic similarity.
 
         Args:
@@ -21,10 +23,12 @@ class SearchService(BaseModel):
         """
         log(f"Searching for vibe: '{query}' (max {n_results} results)", LogLevel.INFO)
 
-        refined_query = self._refine_query(query)
+        refined_query = await self._refine_query(query)
         log(f"Refined query: '{refined_query}'", LogLevel.INFO)
 
-        raw_results = self.vectordb_repository.search_by_vibe(refined_query, n_results)
+        raw_results = await asyncio.to_thread(
+            self.vectordb_repository.search_by_vibe, refined_query, n_results
+        )
         search_results = self._transform_results(query, raw_results)
 
         log(
@@ -34,7 +38,7 @@ class SearchService(BaseModel):
 
         return search_results
 
-    def _refine_query(self, query: str) -> str:
+    async def _refine_query(self, query: str) -> str:
         """Refine the user query to be more descriptive for semantic search."""
         prompt = (
             "You are an expert music curator. Rewrite the following search query to be "
@@ -43,7 +47,7 @@ class SearchService(BaseModel):
             "against a database of song analyses. Return ONLY the refined query text.\n\n"
             f"Original query: '{query}'"
         )
-        return self.llm_client.generate(prompt)
+        return await self.llm_client.generate(prompt)
 
     def _transform_results(
         self, query: str, raw_results: dict[str, list]
