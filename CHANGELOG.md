@@ -1,6 +1,43 @@
 # CHANGELOG
 
 
+## v0.9.0 (2026-02-21)
+
+### Bug Fixes
+
+- **test**: Fix unit tests
+  ([`aec8857`](https://github.com/justmatias/spotify-vibe-searcher/commit/aec8857f4dd10c986a0fa67a81e80f42737662f4))
+
+### Chores
+
+- **config**: Fix lint issues
+  ([`025c6a8`](https://github.com/justmatias/spotify-vibe-searcher/commit/025c6a8cb90304416872dcb5c39ea200976bc397))
+
+- **config**: Update pre-commit hooks
+  ([`838b257`](https://github.com/justmatias/spotify-vibe-searcher/commit/838b2574f0d05510445c2355f66e89e0aa876d45))
+
+- **config**: Update requirements.txt
+  ([`5ff0caa`](https://github.com/justmatias/spotify-vibe-searcher/commit/5ff0caa7207496c00de9d7a5a01c4a1625b35a69))
+
+- **docs**: Update screenshots
+  ([`143fbd5`](https://github.com/justmatias/spotify-vibe-searcher/commit/143fbd5ebb5ab6622fd006e5af2dafe7bc7d54ee))
+
+Removed old screenshots and added new ones to README.
+
+### Features
+
+- **config**: Implement batching for adding tracks to the vector database for improved performance
+  ([`7d9be2b`](https://github.com/justmatias/spotify-vibe-searcher/commit/7d9be2b8df62872e7fa8cdec7187aae2df7d7089))
+
+- **config**: Migrate LLM client and related services to use asynchronous operations and concurrent
+  processing
+  ([`92c018c`](https://github.com/justmatias/spotify-vibe-searcher/commit/92c018c9756c82842deb1072036861af794892cc))
+
+- **ui**: Enhance UI with user profile in sidebar, interactive sync slider, and styled
+  progress/summary displays.
+  ([`b7c7d30`](https://github.com/justmatias/spotify-vibe-searcher/commit/b7c7d30446ce9bf489adf97c8d8b219e0ec968e5))
+
+
 ## v0.8.1 (2026-02-09)
 
 ### Bug Fixes
