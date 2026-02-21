@@ -71,10 +71,33 @@ class VectorDBRepository(BaseModel):
         )
 
     def add_tracks(self, enriched_tracks: list[EnrichedTrack]) -> None:
-        """Add multiple enriched tracks to the collection."""
-        log(f"Adding {len(enriched_tracks)} tracks to VectorDB...", LogLevel.INFO)
-        for enriched_track in enriched_tracks:
-            self.add_track(enriched_track)
+        """Add multiple enriched tracks to the collection in a single batch."""
+        valid_tracks = [t for t in enriched_tracks if t.vibe_description]
+        if not valid_tracks:
+            return
+
+        log(f"Adding {len(valid_tracks)} tracks to VectorDB...", LogLevel.INFO)
+
+        ids = []
+        documents = []
+        metadatas = []
+
+        for enriched_track in valid_tracks:
+            track = enriched_track.track.track
+            ids.append(enriched_track.track_id)
+            documents.append(enriched_track.vibe_description)
+            metadatas.append({
+                "track_id": enriched_track.track_id,
+                "track_name": track.name,
+                "artist_names": track.artist_names,
+                "album_name": track.album.name,
+                "has_lyrics": enriched_track.has_lyrics,
+                "genres": track.all_genre_names,
+                "popularity": track.popularity,
+                "spotify_url": track.spotify_url,
+            })
+
+        self.collection.add(ids=ids, documents=documents, metadatas=metadatas)
         log("Successfully added tracks to VectorDB.", LogLevel.INFO)
 
     def delete_tracks(self, track_ids: list[str]) -> None:
