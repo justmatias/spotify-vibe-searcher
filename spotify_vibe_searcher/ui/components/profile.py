@@ -6,7 +6,7 @@ DEFAULT_AVATAR = "https://i.scdn.co/image/ab6775700000ee8555c25988a6ac314394d3fb
 
 
 def render_user_profile(user: SpotifyUser) -> None:
-    """Render the logged-in user's profile."""
+    """Render a compact user profile card for the sidebar column."""
     avatar_url = user.image_url or DEFAULT_AVATAR
 
     st.markdown(

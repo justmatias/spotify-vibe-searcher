@@ -2,7 +2,7 @@ import streamlit as st
 
 
 def render_hero_section() -> None:
-    """Render the hero section with title and description."""
+    """Render the hero section with animated title and description."""
     st.markdown(
         """
         <div class="hero-section">
@@ -20,11 +20,11 @@ def render_hero_section() -> None:
 
 
 def render_features() -> None:
-    """Render the features section."""
+    """Render the features section with animated cards."""
     st.markdown(
         """
         <div class="feature-grid">
-            <div class="feature-card">
+            <div class="feature-card animate-in animate-in-delay-1">
                 <div class="feature-icon">🔍</div>
                 <div class="feature-title">Semantic Search</div>
                 <div class="feature-description">
@@ -32,7 +32,7 @@ def render_features() -> None:
                     or "upbeat morning energy."
                 </div>
             </div>
-            <div class="feature-card">
+            <div class="feature-card animate-in animate-in-delay-2">
                 <div class="feature-icon">🤖</div>
                 <div class="feature-title">AI-Powered</div>
                 <div class="feature-description">
@@ -40,7 +40,7 @@ def render_features() -> None:
                     and your search queries.
                 </div>
             </div>
-            <div class="feature-card">
+            <div class="feature-card animate-in animate-in-delay-3">
                 <div class="feature-icon">💚</div>
                 <div class="feature-title">Your Library</div>
                 <div class="feature-description">
