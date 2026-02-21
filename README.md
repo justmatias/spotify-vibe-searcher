@@ -21,9 +21,8 @@ A **LLM-powered search engine** application that lets you search your Spotify "L
 - 📊 **Rich Track Metadata**: View popularity, genres, and Spotify links
 - 🎯 **Similarity Scores**: See how well each track matches your query
 
-<img width="1582" height="813" alt="Screenshot from 2026-01-03 09-50-09" src="https://github.com/user-attachments/assets/f87ad772-cc44-4588-ad7d-675f637e3dcd" />
-<img width="1582" height="813" alt="Screenshot from 2026-01-03 09-55-27" src="https://github.com/user-attachments/assets/271e2043-67b7-4ccd-b4cc-41029deff4a3" />
-<img width="1582" height="813" alt="Screenshot from 2026-01-03 09-50-17" src="https://github.com/user-attachments/assets/464dd70f-ef40-4c81-90d5-ef113e83d32f" />
+<img width="1889" height="869" alt="Screenshot from 2026-02-21 14-11-30" src="https://github.com/user-attachments/assets/59b8c2f1-792b-4ec9-8cd6-4b74462ac06e" />
+<img width="1889" height="869" alt="Screenshot from 2026-02-21 14-12-49" src="https://github.com/user-attachments/assets/b738708c-9adc-4db2-b9e3-db5ea70d13c2" />
 
 ## 🧠 How it Works
 
