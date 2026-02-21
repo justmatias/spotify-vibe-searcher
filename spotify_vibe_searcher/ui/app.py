@@ -139,7 +139,7 @@ def app() -> None:
     except Exception as e:
         render_sidebar()
         render_hero_section()
-        st.error(f"⚠️ Configuration Error: {str(e)}")
+        st.error(f"⚠️ Configuration Error: {e!s}")
         st.info(
             """
             **Setup Required:**

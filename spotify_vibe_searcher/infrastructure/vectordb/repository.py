@@ -1,6 +1,5 @@
 """ChromaDB vector database repository."""
 
-from typing import Optional
 
 from chromadb import Collection, PersistentClient
 from chromadb.utils.embedding_functions import OllamaEmbeddingFunction
@@ -13,7 +12,7 @@ from spotify_vibe_searcher.utils import LogLevel, Settings, log
 class VectorDBRepository(BaseModel):
     """Repository for ChromaDB vector database operations."""
 
-    _client: Optional[PersistentClient] = None
+    _client: PersistentClient | None = None
 
     @property
     def client(self) -> PersistentClient:

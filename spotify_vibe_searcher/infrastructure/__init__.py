@@ -4,9 +4,9 @@ from .spotify import SpotifyAuthManager, SpotifyClient
 from .vectordb import VectorDBRepository
 
 __all__ = [
-    "VectorDBRepository",
     "GeniusClient",
-    "SpotifyClient",
     "LLMClient",
     "SpotifyAuthManager",
+    "SpotifyClient",
+    "VectorDBRepository",
 ]
