@@ -7,9 +7,9 @@ def render_footer() -> None:
         """
         <div class="footer">
             <p>
-                Made with 💚 for music lovers · 
-                <a href="https://developer.spotify.com/">Spotify API</a> · 
-                <a href="https://streamlit.io/">Streamlit</a> · 
+                Made with 💚 for music lovers ·
+                <a href="https://developer.spotify.com/">Spotify API</a> ·
+                <a href="https://streamlit.io/">Streamlit</a> ·
                 <a href="https://www.trychroma.com/">ChromaDB</a>
             </p>
         </div>

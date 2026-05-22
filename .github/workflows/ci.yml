@@ -17,10 +17,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
-        env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
         with:
-          token: ${{ env.GH_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 0
 
       - name: Set up Python 3.13
@@ -49,7 +47,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with:
-          token: ${{ secrets.GH_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 0
 
       - name: Set up Python 3.13
@@ -71,14 +69,14 @@ jobs:
         run: |
           uv run poe test
 
-  requirements:
-    name: Requirements
+  pre-commit-autoupdate:
+    name: Pre-commit Autoupdate
     if: github.ref != 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
         with:
-          token: ${{ secrets.GH_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 0
           ref: ${{ github.head_ref }}
 
@@ -97,16 +95,15 @@ jobs:
         run: |
           uv sync --all-groups --frozen
 
-      - name: Generate requirements.txt
-        run: |
-          uv pip compile pyproject.toml -o requirements.txt
+      - name: Autoupdate pre-commit hooks
+        run: uv run pre-commit autoupdate
 
-      - name: Commit and push requirements.txt
+      - name: Commit and push updated hooks
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          git add requirements.txt
-          git diff --staged --quiet || git commit -m "chore(config): update requirements.txt"
+          git add .pre-commit-config.yaml
+          git diff --staged --quiet || git commit -m "chore(config): update pre-commit hooks"
           git push origin HEAD:${{ github.head_ref }}
 
   versioning:
@@ -115,10 +112,8 @@ jobs:
     if: github.ref == 'refs/heads/main'
     steps:
       - uses: actions/checkout@v6
-        env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
         with:
-          token: ${{ env.GH_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 0
 
       - name: Set up Python 3.13
@@ -139,4 +134,4 @@ jobs:
       - name: Bump version and update changelog
         uses: python-semantic-release/python-semantic-release@v9.21.1
         with:
-          github_token: ${{ secrets.GH_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
