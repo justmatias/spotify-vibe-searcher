@@ -1,50 +1,99 @@
-import asyncio
-import pathlib
-from collections.abc import Generator
-from unittest.mock import MagicMock
+"""Fixtures for library sync service tests."""
+
+from collections.abc import AsyncIterator
+from dataclasses import dataclass, field
+from typing import Any
 
 import pytest
 from polyfactory.factories.pydantic_factory import ModelFactory
 
 from vibra.domain import (
     EnrichedTrack,
+    IndexedTrack,
     SavedTrack,
+    SearchResults,
     SpotifyAlbum,
     SpotifyArtist,
     SpotifyTrack,
 )
-from vibra.infrastructure import SpotifyClient, VectorDBRepository
-from vibra.injections import container
-from vibra.services import LibrarySyncService, TrackAnalysisService
-from vibra.utils import Settings
+from vibra.services import (
+    EnrichmentService,
+    IndexingService,
+    LibrarySyncService,
+    TrackAnalysisService,
+    TrackFetchService,
+)
 
 
-@pytest.fixture
-def track_analysis_service() -> TrackAnalysisService:
-    return container.services.track_analysis_service()  # type: ignore[no-any-return]
+@dataclass
+class InMemoryVectorStore:
+    """In-process fake implementing the VectorStore protocol."""
+
+    _store: dict[str, EnrichedTrack] = field(default_factory=dict)
+
+    async def track_exists(self, track_id: str) -> bool:
+        return track_id in self._store
+
+    async def add(self, track: EnrichedTrack) -> None:
+        self._store[track.track_id] = track
+
+    async def add_many(self, tracks: list[EnrichedTrack]) -> None:
+        for track in tracks:
+            self._store[track.track_id] = track
+
+    async def search(self, query: str, n_results: int) -> SearchResults:  # pylint: disable=unused-argument
+        raise NotImplementedError  # pragma: no cover
+
+    async def count(self) -> int:
+        return len(self._store)
+
+    async def delete(self, ids: list[str]) -> None:
+        for id_ in ids:
+            self._store.pop(id_, None)
+
+    async def list_all(self) -> list[IndexedTrack]:
+        raise NotImplementedError  # pragma: no cover
 
 
-@pytest.fixture
-def vectordb_repository(tmp_path: pathlib.Path) -> Generator[VectorDBRepository]:
-    original_data_dir = Settings.DATA_DIR
-    Settings.DATA_DIR = tmp_path
-    yield VectorDBRepository()
-    Settings.DATA_DIR = original_data_dir
+@dataclass
+class FakeMusicLibrary:
+    """In-process fake implementing the MusicLibrary protocol."""
+
+    tracks: list[SavedTrack] = field(default_factory=list)
+
+    async def read_liked_songs(self, max_tracks: int) -> AsyncIterator[SavedTrack]:
+        async def _gen() -> AsyncIterator[SavedTrack]:
+            for t in self.tracks[:max_tracks]:
+                yield t
+
+        return _gen()
+
+    async def get_artists(self, ids: list[str]) -> list[SpotifyArtist]:
+        artist_map = {a.id_: a for t in self.tracks for a in t.track.artists}
+        return [artist_map[id_] for id_ in ids if id_ in artist_map]
+
+    async def current_user(self) -> Any:  # pragma: no cover
+        raise NotImplementedError
 
 
-@pytest.fixture
-def _populate_tracks(
-    vectordb_repository: VectorDBRepository,
-    realistic_liked_songs: list[SavedTrack],
-    enriched_track_factory: ModelFactory[EnrichedTrack],
-) -> None:
-    saved_track = realistic_liked_songs[1]  # Stairway to Heaven
-    enriched_track = enriched_track_factory.build(
-        track=saved_track,
-        vibe_description="Existing vibe description",
-        has_lyrics=True,
-    )
-    asyncio.run(vectordb_repository.add(enriched_track))
+@dataclass
+class FakeLyricsProvider:
+    """In-process fake implementing the LyricsProvider protocol."""
+
+    return_value: str = "Some lyrics content"
+
+    async def fetch(self, *, title: str, artist: str) -> str:  # pylint: disable=unused-argument
+        return self.return_value
+
+
+@dataclass
+class FakeLLMProvider:
+    """In-process fake implementing the LLMProvider protocol."""
+
+    return_value: str = "A vibe description."
+
+    async def generate(self, prompt: str) -> str:  # pylint: disable=unused-argument
+        return self.return_value
 
 
 @pytest.fixture
@@ -52,11 +101,9 @@ def enriched_track_with_lyrics(
     enriched_track_factory: ModelFactory[EnrichedTrack],
     saved_track_factory: ModelFactory[SavedTrack],
 ) -> EnrichedTrack:
-    track = saved_track_factory.build()
     return enriched_track_factory.build(
-        track=track,
+        track=saved_track_factory.build(),
         lyrics="Test lyrics content",
-        has_lyrics=True,
     )
 
 
@@ -65,26 +112,10 @@ def enriched_track_without_lyrics(
     enriched_track_factory: ModelFactory[EnrichedTrack],
     saved_track_factory: ModelFactory[SavedTrack],
 ) -> EnrichedTrack:
-    track = saved_track_factory.build()
     return enriched_track_factory.build(
-        track=track,
+        track=saved_track_factory.build(),
         lyrics="",
-        has_lyrics=False,
     )
-
-
-@pytest.fixture
-def liked_songs(
-    saved_track_factory: ModelFactory[SavedTrack],
-) -> list[SavedTrack]:
-    return [saved_track_factory.build() for _ in range(3)]
-
-
-@pytest.fixture
-def liked_songs_lyrics(
-    saved_track_factory: ModelFactory[SavedTrack],
-) -> list[SavedTrack]:
-    return [saved_track_factory.build() for _ in range(3)]
 
 
 @pytest.fixture
@@ -134,23 +165,23 @@ def realistic_liked_songs(
     ]
 
 
-@pytest.fixture
-def mock_spotify_client(
-    realistic_liked_songs: list[SavedTrack],
-) -> MagicMock:
-    client = MagicMock(spec=SpotifyClient)
-    client.get_all_liked_songs.return_value = realistic_liked_songs
-    return client
+def make_library_sync_service(
+    tracks: list[SavedTrack],
+    lyrics_value: str = "Some lyrics content",
+    vibe_value: str = "A vibe description.",
+) -> LibrarySyncService:
+    return LibrarySyncService(
+        track_fetch=TrackFetchService(music_library=FakeMusicLibrary(tracks=tracks)),
+        enrichment=EnrichmentService(
+            lyrics=FakeLyricsProvider(return_value=lyrics_value),
+            analyzer=TrackAnalysisService(llm_client=FakeLLMProvider(return_value=vibe_value)),
+        ),
+        indexing=IndexingService(store=InMemoryVectorStore()),
+    )
 
 
 @pytest.fixture
 def library_sync_service(
-    mock_spotify_client: MagicMock,
-    vectordb_repository: VectorDBRepository,
+    realistic_liked_songs: list[SavedTrack],
 ) -> LibrarySyncService:
-    return LibrarySyncService(
-        spotify_client=mock_spotify_client,
-        genius_client=container.infrastructure.genius_client(),
-        track_analysis_service=container.services.track_analysis_service(),
-        vectordb_repository=vectordb_repository,
-    )
+    return make_library_sync_service(realistic_liked_songs)
