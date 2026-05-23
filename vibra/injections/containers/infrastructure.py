@@ -1,3 +1,5 @@
+"""Production infrastructure dependency providers."""
+
 import chromadb
 from dependency_injector import containers, providers
 
@@ -13,6 +15,8 @@ from vibra.utils import Settings
 
 
 class InfrastructureContainer(containers.DeclarativeContainer):
+    """Container for production infrastructure layer dependencies."""
+
     # Spotify access token is supplied per-request at call time:
     #   container.infrastructure.spotify_client(access_token=token.access_token)
     config = providers.Configuration()
@@ -30,7 +34,10 @@ class InfrastructureContainer(containers.DeclarativeContainer):
         chromadb.PersistentClient,
         path=str(Settings.CHROMADB_PATH),
     )
-    _embedding_fn = providers.Singleton(OllamaEmbeddingFunction)
+    _embedding_fn = providers.Singleton(
+        OllamaEmbeddingFunction,
+        model_name=Settings.EMBEDDING_MODEL,
+    )
     vectordb_repository = providers.Singleton(
         VectorDBRepository,
         client=_chromadb_client,
