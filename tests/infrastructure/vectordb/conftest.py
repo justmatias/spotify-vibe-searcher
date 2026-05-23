@@ -1,4 +1,5 @@
 # pylint: disable=line-too-long
+import asyncio
 import pathlib
 from collections.abc import Generator
 
@@ -93,7 +94,7 @@ def _populate_with_single_track(
     vectordb_repository: VectorDBRepository,
     enriched_track_with_vibe: EnrichedTrack,
 ) -> None:
-    vectordb_repository.add_track(enriched_track_with_vibe)
+    asyncio.run(vectordb_repository.add(enriched_track_with_vibe))
 
 
 @pytest.fixture
@@ -101,7 +102,7 @@ def _populate_with_batch(
     vectordb_repository: VectorDBRepository,
     enriched_tracks_batch: list[EnrichedTrack],
 ) -> None:
-    vectordb_repository.add_tracks(enriched_tracks_batch)
+    asyncio.run(vectordb_repository.add_many(enriched_tracks_batch))
 
 
 @pytest.fixture
@@ -109,4 +110,4 @@ def _populate_with_search_tracks(
     vectordb_repository: VectorDBRepository,
     enriched_tracks_for_search: list[EnrichedTrack],
 ) -> None:
-    vectordb_repository.add_tracks(enriched_tracks_for_search)
+    asyncio.run(vectordb_repository.add_many(enriched_tracks_for_search))

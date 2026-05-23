@@ -1,4 +1,6 @@
 # pylint: disable=too-many-locals
+import asyncio
+
 import pandas as pd
 import streamlit as st
 
@@ -23,7 +25,7 @@ def render_library_section() -> None:
     )
 
     repository = container.infrastructure.vectordb_repository()
-    count = repository.count_tracks()
+    count = asyncio.run(repository.count())
 
     col1, col2, col3 = st.columns([1, 1, 1])
     with col1:
@@ -41,7 +43,7 @@ def render_library_section() -> None:
                 all_data = repository.get_all_tracks()
                 track_ids = all_data.get("ids", [])
                 if track_ids:
-                    repository.delete_tracks(track_ids)
+                    asyncio.run(repository.delete(track_ids))
                     st.success(f"✅ Deleted {len(track_ids)} tracks from database!")
                     st.rerun()
 

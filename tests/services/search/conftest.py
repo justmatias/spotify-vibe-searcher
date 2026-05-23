@@ -1,4 +1,5 @@
 # pylint: disable=line-too-long, duplicate-code
+import asyncio
 import pathlib
 from collections.abc import Generator
 
@@ -61,4 +62,4 @@ def _populate_search_tracks(vectordb_repository: VectorDBRepository) -> None:
         ),
     ]
 
-    vectordb_repository.add_tracks(tracks)
+    asyncio.run(vectordb_repository.add_many(tracks))

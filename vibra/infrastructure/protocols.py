@@ -1,5 +1,5 @@
 from collections.abc import AsyncIterator
-from typing import Protocol
+from typing import Protocol, runtime_checkable
 
 from vibra.domain import (
     EnrichedTrack,
@@ -11,12 +11,14 @@ from vibra.domain import (
 )
 
 
+@runtime_checkable
 class MusicLibrary(Protocol):
     async def current_user(self) -> SpotifyUser: ...
     async def read_liked_songs(self, max_tracks: int) -> AsyncIterator[SavedTrack]: ...
     async def get_artists(self, ids: list[str]) -> list[SpotifyArtist]: ...
 
 
+@runtime_checkable
 class AuthProvider(Protocol):
     def get_auth_url(self) -> str: ...
     async def exchange_code(self, code: str) -> OAuthToken: ...
@@ -24,14 +26,17 @@ class AuthProvider(Protocol):
     async def refresh(self, refresh_token: str) -> OAuthToken: ...
 
 
+@runtime_checkable
 class LyricsProvider(Protocol):
     async def fetch(self, *, title: str, artist: str) -> str: ...
 
 
+@runtime_checkable
 class LLMProvider(Protocol):
     async def generate(self, prompt: str) -> str: ...
 
 
+@runtime_checkable
 class VectorStore(Protocol):
     async def track_exists(self, track_id: str) -> bool: ...
     async def add(self, track: EnrichedTrack) -> None: ...

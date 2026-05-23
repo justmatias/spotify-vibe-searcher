@@ -1,3 +1,4 @@
+import asyncio
 import pathlib
 from collections.abc import Generator
 from unittest.mock import MagicMock
@@ -43,7 +44,7 @@ def _populate_tracks(
         vibe_description="Existing vibe description",
         has_lyrics=True,
     )
-    vectordb_repository.add_track(enriched_track)
+    asyncio.run(vectordb_repository.add(enriched_track))
 
 
 @pytest.fixture

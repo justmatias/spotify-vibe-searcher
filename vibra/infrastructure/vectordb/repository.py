@@ -1,13 +1,19 @@
 """ChromaDB vector database repository."""
 
+import asyncio
+from functools import cached_property
 from typing import Optional
 
+import stamina
 from chromadb import Collection, PersistentClient
 from chromadb.utils.embedding_functions import OllamaEmbeddingFunction
 from pydantic import BaseModel
 
-from vibra.domain import EnrichedTrack
+from vibra.domain import EnrichedTrack, SearchResults
 from vibra.utils import LogLevel, Settings, log
+
+from .config import RETRY_ON
+from .mappers import chroma_query_to_results, enriched_to_payload
 
 
 class VectorDBRepository(BaseModel):
@@ -15,124 +21,86 @@ class VectorDBRepository(BaseModel):
 
     _client: Optional[PersistentClient] = None  # noqa
 
-    @property
-    def client(self) -> PersistentClient:
-        """Lazy-load persistent ChromaDB client."""
-        if self._client is None:
-            Settings.CHROMADB_PATH.mkdir(parents=True, exist_ok=True)
-            log(
-                f"Initializing ChromaDB client at {Settings.CHROMADB_PATH}",
-                LogLevel.INFO,
-            )
-            self._client = PersistentClient(path=str(Settings.CHROMADB_PATH))
-        return self._client
-
-    @property
+    @cached_property
     def collection(self) -> Collection:
-        return self.get_or_create_collection()
-
-    def get_or_create_collection(self) -> Collection:
-        """Get or create a collection by name with cosine similarity."""
-        return self.client.get_or_create_collection(
+        Settings.CHROMADB_PATH.mkdir(parents=True, exist_ok=True)
+        log(
+            f"Initializing ChromaDB client at {Settings.CHROMADB_PATH}",
+            LogLevel.INFO,
+        )
+        client = PersistentClient(path=str(Settings.CHROMADB_PATH))
+        return client.get_or_create_collection(
             name=Settings.CHROMADB_COLLECTION,
             embedding_function=OllamaEmbeddingFunction(
                 model_name=Settings.EMBEDDING_MODEL
             ),
-            metadata={"hnsw:space": "cosine"},  # Use cosine similarity
+            metadata={"hnsw:space": "cosine"},
         )
 
-    def add_track(self, enriched_track: EnrichedTrack) -> None:
-        """Add a single enriched track to the collection."""
-        if not enriched_track.vibe_description:
+    async def track_exists(self, track_id: str) -> bool:
+        result = await asyncio.to_thread(self._get_ids, track_id)
+        return len(result) > 0
+
+    async def add(self, track: EnrichedTrack) -> None:
+        if not track.vibe_description:
             return
-
-        track = enriched_track.track.track
-
-        metadata = {
-            "track_id": enriched_track.track_id,
-            "track_name": track.name,
-            "artist_names": track.artist_names,
-            "album_name": track.album.name,
-            "has_lyrics": enriched_track.has_lyrics,
-            "genres": track.all_genre_names,
-            "popularity": track.popularity,
-            "spotify_url": track.spotify_url,
-        }
-
+        payload = enriched_to_payload(track)
         log(
-            f"Storing track '{track.name}' with genres: '{track.all_genre_names}'",
+            f"Storing track '{track.track.track.name}'",
             LogLevel.DEBUG,
         )
-
-        self.collection.add(
-            ids=[enriched_track.track_id],
-            documents=[enriched_track.vibe_description],
-            metadatas=[metadata],
+        await asyncio.to_thread(
+            self._add_to_collection,
+            payload["ids"],
+            payload["documents"],
+            payload["metadatas"],
         )
 
-    def add_tracks(self, enriched_tracks: list[EnrichedTrack]) -> None:
-        """Add multiple enriched tracks to the collection in a single batch."""
-        valid_tracks = [t for t in enriched_tracks if t.vibe_description]
-        if not valid_tracks:
+    async def add_many(self, tracks: list[EnrichedTrack]) -> None:
+        valid = [t for t in tracks if t.vibe_description]
+        if not valid:
             return
-
-        log(f"Adding {len(valid_tracks)} tracks to VectorDB...", LogLevel.INFO)
-
-        ids = []
-        documents = []
-        metadatas = []
-
-        for enriched_track in valid_tracks:
-            track = enriched_track.track.track
-            ids.append(enriched_track.track_id)
-            documents.append(enriched_track.vibe_description)
-            metadatas.append({
-                "track_id": enriched_track.track_id,
-                "track_name": track.name,
-                "artist_names": track.artist_names,
-                "album_name": track.album.name,
-                "has_lyrics": enriched_track.has_lyrics,
-                "genres": track.all_genre_names,
-                "popularity": track.popularity,
-                "spotify_url": track.spotify_url,
-            })
-
-        self.collection.add(ids=ids, documents=documents, metadatas=metadatas)
+        log(f"Adding {len(valid)} tracks to VectorDB...", LogLevel.INFO)
+        ids, documents, metadatas = [], [], []
+        for track in valid:
+            payload = enriched_to_payload(track)
+            ids.extend(payload["ids"])
+            documents.extend(payload["documents"])
+            metadatas.extend(payload["metadatas"])
+        await asyncio.to_thread(self._add_to_collection, ids, documents, metadatas)
         log("Successfully added tracks to VectorDB.", LogLevel.INFO)
 
-    def delete_tracks(self, track_ids: list[str]) -> None:
-        log(f"Deleting {len(track_ids)} tracks from VectorDB...", LogLevel.INFO)
-        self.collection.delete(ids=track_ids)
-
-    def track_exists(self, track_id: str) -> bool:
-        result = self.collection.get(ids=[track_id])
-        return len(result["ids"]) > 0
-
-    def search_by_vibe(self, query: str, n_results: int = 10) -> dict[str, list]:
-        """Search for tracks by vibe description using semantic similarity.
-
-        Args:
-            query: Natural language query describing the desired vibe.
-            n_results: Maximum number of results to return.
-
-        Returns:
-            Dictionary containing:
-                - ids: List of track IDs
-                - documents: List of vibe descriptions
-                - metadatas: List of track metadata
-                - distances: List of similarity distances (lower is better)
-        """
+    async def search(self, query: str, n_results: int = 10) -> SearchResults:
         log(f"Searching for vibe: '{query}'", LogLevel.INFO)
-        results = self.collection.query(
-            query_texts=[query],
-            n_results=n_results,
-        )
-        log(f"Found {len(results['ids'][0])} matching tracks", LogLevel.INFO)
-        return results  # type: ignore[no-any-return]
+        raw = await asyncio.to_thread(self._query_collection, query, n_results)
+        results = chroma_query_to_results(query, raw)
+        log(f"Found {results.total_results} matching tracks", LogLevel.INFO)
+        return results
+
+    async def count(self) -> int:
+        return await asyncio.to_thread(self.collection.count)
+
+    async def delete(self, ids: list[str]) -> None:
+        log(f"Deleting {len(ids)} tracks from VectorDB...", LogLevel.INFO)
+        await asyncio.to_thread(self.collection.delete, ids)
 
     def get_all_tracks(self) -> dict[str, list]:
         log("Retrieving all tracks from VectorDB...", LogLevel.INFO)
         return self.collection.get()  # type: ignore[no-any-return]
 
-    def count_tracks(self) -> int:
-        return int(self.collection.count())
+    @stamina.retry(on=RETRY_ON, attempts=3)
+    def _get_ids(self, track_id: str) -> list[str]:
+        return self.collection.get(ids=[track_id])["ids"]
+
+    @stamina.retry(on=RETRY_ON, attempts=3)
+    def _add_to_collection(
+        self,
+        ids: list[str],
+        documents: list[str],
+        metadatas: list[dict],
+    ) -> None:
+        self.collection.add(ids=ids, documents=documents, metadatas=metadatas)
+
+    @stamina.retry(on=RETRY_ON, attempts=3)
+    def _query_collection(self, query: str, n_results: int) -> dict[str, list]:
+        return self.collection.query(query_texts=[query], n_results=n_results)  # type: ignore[no-any-return]

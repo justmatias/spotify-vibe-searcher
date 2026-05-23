@@ -47,14 +47,14 @@ class LibrarySyncService(BaseModel):
         self, saved_track: SavedTrack
     ) -> Generator[EnrichedTrack, None, None]:
         track = saved_track.track
-        if self.vectordb_repository.track_exists(track.id_):
+        if asyncio.run(self.vectordb_repository.track_exists(track.id_)):
             log(f"Skipping '{track.name}' - already indexed.", LogLevel.DEBUG)
             return
 
         try:
             enriched = self._enrich_track(saved_track)
             if enriched.vibe_description:
-                self.vectordb_repository.add_track(enriched)
+                asyncio.run(self.vectordb_repository.add(enriched))
             yield enriched
         except Exception as e:  # pragma: no cover  # noqa: BLE001
             log(f"Failed to enrich '{track.name}': {e}", LogLevel.WARNING)
