@@ -1,6 +1,6 @@
 from typing import TypedDict
 
-from vibra.domain import EnrichedTrack, SearchResult, SearchResults
+from vibra.domain import EnrichedTrack, IndexedTrack, SearchResult, SearchResults
 
 
 class ChromaPayload(TypedDict):
@@ -26,6 +26,24 @@ def enriched_to_payload(track: EnrichedTrack) -> ChromaPayload:
         documents=[track.vibe_description or ""],
         metadatas=[metadata],
     )
+
+
+def chroma_get_to_indexed_tracks(raw: dict[str, list]) -> list[IndexedTrack]:
+    ids: list[str] = raw.get("ids") or []
+    metadatas: list[dict] = raw.get("metadatas") or [{}] * len(ids)
+    documents: list[str] = raw.get("documents") or [""] * len(ids)
+    return [
+        IndexedTrack(
+            id=ids[i],
+            track_name=metadatas[i].get("track_name", ""),
+            artist_names=metadatas[i].get("artist_names", ""),
+            album_name=metadatas[i].get("album_name", ""),
+            vibe_description=documents[i],
+            popularity=metadatas[i].get("popularity", 0),
+            spotify_url=metadatas[i].get("spotify_url", ""),
+        )
+        for i in range(len(ids))
+    ]
 
 
 def chroma_query_to_results(query: str, raw: dict[str, list]) -> SearchResults:

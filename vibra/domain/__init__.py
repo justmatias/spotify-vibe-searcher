@@ -7,13 +7,21 @@ from .exceptions import (
 )
 from .search import SearchResult, SearchResults
 from .sync import EnrichedTrack, SyncProgress
-from .track import SavedTrack, SpotifyAlbum, SpotifyArtist, SpotifyImage, SpotifyTrack
+from .track import (
+    IndexedTrack,
+    SavedTrack,
+    SpotifyAlbum,
+    SpotifyArtist,
+    SpotifyImage,
+    SpotifyTrack,
+)
 from .user import OAuthToken, SpotifyUser
 
 __all__ = [
     "AuthError",
     "EnrichedTrack",
     "EnrichmentError",
+    "IndexedTrack",
     "LyricsNotFoundError",
     "OAuthToken",
     "SavedTrack",

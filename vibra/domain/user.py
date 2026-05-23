@@ -18,5 +18,7 @@ class OAuthToken(BaseModel):
     access_token: str
     refresh_token: str
     expires_at: datetime
-    scope: list[str]
+    scope: str
     token_type: str
+
+    model_config = ConfigDict(frozen=True)

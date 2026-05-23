@@ -80,3 +80,14 @@ class SavedTrack(BaseModel):
     @property
     def track_id(self) -> str:
         return self.track.id_
+
+
+class IndexedTrack(BaseModel):
+    id: str
+    track_name: str
+    artist_names: str
+    album_name: str
+    vibe_description: str
+    popularity: int
+    spotify_url: str
+    model_config = ConfigDict(frozen=True)

@@ -1,6 +1,6 @@
 import pytest
 
-from vibra.domain import EnrichedTrack, SearchResults
+from vibra.domain import EnrichedTrack, IndexedTrack, SearchResults
 from vibra.infrastructure import VectorDBRepository
 
 
@@ -127,13 +127,15 @@ async def test_search_by_vibe_returns_metadata(
         assert first.album_name is not None
 
 
+@pytest.mark.asyncio
 @pytest.mark.vcr
 @pytest.mark.usefixtures("_populate_with_batch")
-def test_get_all_tracks(
+async def test_list_all(
     vectordb_repository: VectorDBRepository,
 ) -> None:
-    results = vectordb_repository.get_all_tracks()
-    assert len(results["ids"]) > 0
+    results = await vectordb_repository.list_all()
+    assert len(results) > 0
+    assert all(isinstance(t, IndexedTrack) for t in results)
 
 
 @pytest.mark.asyncio

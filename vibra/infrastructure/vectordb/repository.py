@@ -2,24 +2,21 @@
 
 import asyncio
 from functools import cached_property
-from typing import Optional
 
 import stamina
 from chromadb import Collection, PersistentClient
 from chromadb.utils.embedding_functions import OllamaEmbeddingFunction
 from pydantic import BaseModel
 
-from vibra.domain import EnrichedTrack, SearchResults
+from vibra.domain import EnrichedTrack, IndexedTrack, SearchResults
 from vibra.utils import LogLevel, Settings, log
 
 from .config import RETRY_ON
-from .mappers import chroma_query_to_results, enriched_to_payload
+from .mappers import chroma_get_to_indexed_tracks, chroma_query_to_results, enriched_to_payload
 
 
 class VectorDBRepository(BaseModel):
     """Repository for ChromaDB vector database operations."""
-
-    _client: Optional[PersistentClient] = None  # noqa
 
     @cached_property
     def collection(self) -> Collection:
@@ -84,13 +81,15 @@ class VectorDBRepository(BaseModel):
         log(f"Deleting {len(ids)} tracks from VectorDB...", LogLevel.INFO)
         await asyncio.to_thread(self.collection.delete, ids)
 
-    def get_all_tracks(self) -> dict[str, list]:
-        log("Retrieving all tracks from VectorDB...", LogLevel.INFO)
-        return self.collection.get()  # type: ignore[no-any-return]
+    async def list_all(self) -> list[IndexedTrack]:
+        log("Retrieving all indexed tracks from VectorDB...", LogLevel.INFO)
+        raw = await asyncio.to_thread(self.collection.get)
+        return chroma_get_to_indexed_tracks(raw)
 
     @stamina.retry(on=RETRY_ON, attempts=3)
     def _get_ids(self, track_id: str) -> list[str]:
-        return self.collection.get(ids=[track_id])["ids"]
+        result: dict[str, list] = self.collection.get(ids=[track_id])
+        return result["ids"]
 
     @stamina.retry(on=RETRY_ON, attempts=3)
     def _add_to_collection(
