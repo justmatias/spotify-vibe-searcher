@@ -1,15 +1,25 @@
-import pytest
+import asyncio
 
-from tests.helpers.auth import get_spotify_token
+import pytest
+from spotipy.oauth2 import SpotifyOauthError
+
 from vibra.infrastructure.spotify import SpotifyClient
+from vibra.infrastructure.spotify.auth_manager import SpotifyAuthManager
 
 
 @pytest.fixture
-def spotify_client() -> SpotifyClient:
-    # Use real token from auth helper for recording, fallback to mocked token for replay
-    # if auth helper returns None (no cache)
-    token = get_spotify_token() or "MOCKED_TOKEN"
-    return SpotifyClient(access_token=token)
+def spotify_token() -> str:
+    """Return a cached Spotify access token for cassette recording, or a mock token."""
+    try:
+        token = asyncio.run(SpotifyAuthManager().cached_token())
+        return token.access_token if token else "MOCKED_TOKEN"
+    except SpotifyOauthError:
+        return "MOCKED_TOKEN"
+
+
+@pytest.fixture
+def spotify_client(spotify_token: str) -> SpotifyClient:
+    return SpotifyClient(access_token=spotify_token)
 
 
 @pytest.fixture(

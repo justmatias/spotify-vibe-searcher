@@ -12,7 +12,11 @@ from vibra.domain import EnrichedTrack, IndexedTrack, SearchResults
 from vibra.utils import LogLevel, Settings, log
 
 from .config import RETRY_ON
-from .mappers import chroma_get_to_indexed_tracks, chroma_query_to_results, enriched_to_payload
+from .mappers import (
+    chroma_get_to_indexed_tracks,
+    chroma_query_to_results,
+    enriched_to_payload,
+)
 
 
 class VectorDBRepository(BaseModel):

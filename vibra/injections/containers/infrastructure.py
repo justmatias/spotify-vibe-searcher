@@ -14,13 +14,9 @@ from vibra.infrastructure import (
 class InfrastructureContainer(containers.DeclarativeContainer):
     """Container for infrastructure layer dependencies."""
 
-    config = providers.Configuration()
-
-    # Factories(one instance per user)
-    spotify_client = providers.Factory(
-        SpotifyClient,
-        access_token=config.spotify.access_token,
-    )
+    # Factory — caller passes access_token at call time:
+    # container.infrastructure.spotify_client(access_token=token.access_token)
+    spotify_client = providers.Factory(SpotifyClient)
 
     # Singletons
     spotify_auth_manager = providers.Singleton(SpotifyAuthManager)
