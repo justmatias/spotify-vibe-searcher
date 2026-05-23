@@ -3,7 +3,7 @@ import contextlib
 from pydantic import BaseModel, ConfigDict
 
 from vibra.domain import SavedTrack
-from vibra.infrastructure.protocols import LLMProvider
+from vibra.domain.ports import LLMProvider
 from vibra.utils import LogLevel, log
 
 

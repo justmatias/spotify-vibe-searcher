@@ -1,7 +1,7 @@
 from pydantic import BaseModel, ConfigDict
 
 from vibra.domain import SearchResults
-from vibra.infrastructure.protocols import LLMProvider, VectorStore
+from vibra.domain.ports import LLMProvider, VectorStore
 from vibra.utils import LogLevel, log
 
 

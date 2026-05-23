@@ -1,22 +1,22 @@
 # pylint: disable=line-too-long
 import asyncio
-import pathlib
-from collections.abc import Generator
+import uuid
 
+import chromadb
 import pytest
 from polyfactory.factories.pydantic_factory import ModelFactory
 
 from vibra.domain import EnrichedTrack, SavedTrack
-from vibra.infrastructure import VectorDBRepository
-from vibra.utils import Settings
+from vibra.infrastructure import StubEmbeddingFunction, VectorDBRepository
 
 
 @pytest.fixture
-def vectordb_repository(tmp_path: pathlib.Path) -> Generator[VectorDBRepository]:
-    original_data_dir = Settings.DATA_DIR
-    Settings.DATA_DIR = tmp_path
-    yield VectorDBRepository()
-    Settings.DATA_DIR = original_data_dir
+def vectordb_repository() -> VectorDBRepository:
+    return VectorDBRepository(
+        client=chromadb.EphemeralClient(),
+        embedding_fn=StubEmbeddingFunction(),
+        collection_name=str(uuid.uuid4()),
+    )
 
 
 @pytest.fixture

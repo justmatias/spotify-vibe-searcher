@@ -3,7 +3,7 @@
 from pydantic import BaseModel, ConfigDict
 
 from vibra.domain import SavedTrack, SpotifyArtist
-from vibra.infrastructure.protocols import MusicLibrary
+from vibra.domain.ports import MusicLibrary
 from vibra.utils import LogLevel, log
 
 
@@ -15,7 +15,7 @@ class TrackFetchService(BaseModel):
     async def fetch(self, limit: int) -> list[SavedTrack]:
         log(f"Fetching up to {limit} liked songs...", LogLevel.INFO)
         tracks: list[SavedTrack] = []
-        async for saved_track in await self.music_library.read_liked_songs(limit):
+        async for saved_track in self.music_library.read_liked_songs(limit):
             tracks.append(saved_track)
 
         artist_ids = [artist.id_ for st in tracks for artist in st.track.artists]

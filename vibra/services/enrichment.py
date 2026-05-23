@@ -3,7 +3,7 @@
 from pydantic import BaseModel, ConfigDict
 
 from vibra.domain import EnrichedTrack, SavedTrack
-from vibra.infrastructure.protocols import LyricsProvider
+from vibra.domain.ports import LyricsProvider
 from vibra.utils import LogLevel, log
 
 from .track_analysis import TrackAnalysisService

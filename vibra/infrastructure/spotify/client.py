@@ -38,8 +38,6 @@ class SpotifyClient(BaseModel):
         return self.client.current_user_saved_tracks(limit=limit, offset=offset)  # type: ignore[no-any-return]
 
     async def read_liked_songs(self, max_tracks: int = 500) -> AsyncIterator[SavedTrack]:
-        log(f"Fetching up to {max_tracks} liked songs...", LogLevel.INFO)
-
         offset = 0
         yielded = 0
         while offset < max_tracks:
@@ -51,7 +49,6 @@ class SpotifyClient(BaseModel):
                 yield to_saved_track(item)
                 yielded += 1
             offset += 50
-
         log(f"Fetched {yielded} liked songs.", LogLevel.INFO)
 
     @stamina.retry(on=RETRY_ON, attempts=3)

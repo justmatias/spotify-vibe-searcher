@@ -1,21 +1,16 @@
 from collections.abc import AsyncIterator
 from typing import Protocol, runtime_checkable
 
-from vibra.domain import (
-    EnrichedTrack,
-    IndexedTrack,
-    OAuthToken,
-    SavedTrack,
-    SearchResults,
-    SpotifyArtist,
-    SpotifyUser,
-)
+from vibra.domain.search import SearchResults
+from vibra.domain.sync import EnrichedTrack
+from vibra.domain.track import IndexedTrack, SavedTrack, SpotifyArtist
+from vibra.domain.user import OAuthToken, SpotifyUser
 
 
 @runtime_checkable
 class MusicLibrary(Protocol):
     async def current_user(self) -> SpotifyUser: ...
-    async def read_liked_songs(self, max_tracks: int) -> AsyncIterator[SavedTrack]: ...
+    def read_liked_songs(self, max_tracks: int) -> AsyncIterator[SavedTrack]: ...
     async def get_artists(self, ids: list[str]) -> list[SpotifyArtist]: ...
 
 
