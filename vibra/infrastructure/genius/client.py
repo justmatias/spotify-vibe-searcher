@@ -15,7 +15,6 @@ class GeniusClient(BaseModel):
     def client(self) -> Genius:
         return Genius(
             Settings.GENIUS_API_KEY,
-            verbose=False,
             remove_section_headers=True,
         )
 
