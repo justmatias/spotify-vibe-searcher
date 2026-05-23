@@ -10,9 +10,8 @@ import stamina
 from pydantic import BaseModel
 from spotipy import Spotify
 
-from vibra.domain import SavedTrack, SpotifyUser
-from vibra.domain.track import SpotifyArtist
-from vibra.utils.logger import LogLevel, log
+from vibra.domain import SavedTrack, SpotifyArtist, SpotifyUser
+from vibra.utils import LogLevel, log
 
 from .config import RETRY_ON
 from .mappers import to_artist, to_saved_track, to_user
@@ -37,7 +36,9 @@ class SpotifyClient(BaseModel):
     def _fetch_page(self, limit: int = 50, offset: int = 0) -> dict[str, Any]:
         return self.client.current_user_saved_tracks(limit=limit, offset=offset)  # type: ignore[no-any-return]
 
-    async def read_liked_songs(self, max_tracks: int = 500) -> AsyncIterator[SavedTrack]:
+    async def read_liked_songs(
+        self, max_tracks: int = 500
+    ) -> AsyncIterator[SavedTrack]:
         offset = 0
         yielded = 0
         while offset < max_tracks:

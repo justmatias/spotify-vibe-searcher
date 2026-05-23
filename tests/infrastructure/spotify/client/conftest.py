@@ -3,8 +3,7 @@ import asyncio
 import pytest
 from spotipy.oauth2 import SpotifyOauthError
 
-from vibra.infrastructure.spotify import SpotifyClient
-from vibra.infrastructure.spotify.auth_manager import SpotifyAuthManager
+from vibra.infrastructure import SpotifyAuthManager, SpotifyClient
 
 
 @pytest.fixture

@@ -2,8 +2,7 @@
 
 from pydantic import BaseModel, ConfigDict
 
-from vibra.domain import SavedTrack, SpotifyArtist
-from vibra.domain.ports import MusicLibrary
+from vibra.domain import MusicLibrary, SavedTrack, SpotifyArtist
 from vibra.utils import LogLevel, log
 
 

@@ -2,8 +2,7 @@
 
 from pydantic import BaseModel, ConfigDict
 
-from vibra.domain import EnrichedTrack
-from vibra.domain.ports import VectorStore
+from vibra.domain import EnrichedTrack, VectorStore
 
 
 class IndexingService(BaseModel):

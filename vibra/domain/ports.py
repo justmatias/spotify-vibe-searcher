@@ -1,10 +1,10 @@
 from collections.abc import AsyncIterator
 from typing import Protocol, runtime_checkable
 
-from vibra.domain.search import SearchResults
-from vibra.domain.sync import EnrichedTrack
-from vibra.domain.track import IndexedTrack, SavedTrack, SpotifyArtist
-from vibra.domain.user import OAuthToken, SpotifyUser
+from .search import SearchResults
+from .sync import EnrichedTrack
+from .track import IndexedTrack, SavedTrack, SpotifyArtist
+from .user import OAuthToken, SpotifyUser
 
 
 @runtime_checkable

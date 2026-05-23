@@ -1,7 +1,7 @@
 import pytest
 from polyfactory.factories.pydantic_factory import ModelFactory
 
-from vibra.domain.track import (
+from vibra.domain import (
     SpotifyAlbum,
     SpotifyArtist,
     SpotifyImage,

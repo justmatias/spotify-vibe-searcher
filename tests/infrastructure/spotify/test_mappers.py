@@ -1,5 +1,3 @@
-"""Pure unit tests for spotify mappers — no I/O, no cassettes."""
-
 from typing import Any
 
 from vibra.domain import OAuthToken, SavedTrack, SpotifyArtist, SpotifyUser
@@ -51,7 +49,9 @@ def test_to_artist_maps_fields(spotify_artist_payload: dict[str, Any]) -> None:
     assert artist.genres == ["rock", "indie"]
 
 
-def test_to_artist_defaults_empty_genres(spotify_artist_payload: dict[str, Any]) -> None:
+def test_to_artist_defaults_empty_genres(
+    spotify_artist_payload: dict[str, Any],
+) -> None:
     payload = {**spotify_artist_payload, "genres": []}
     artist = to_artist(payload)
 
