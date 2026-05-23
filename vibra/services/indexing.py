@@ -1,5 +1,3 @@
-"""Service for checking and writing tracks to the vector store."""
-
 from pydantic import BaseModel, ConfigDict
 
 from vibra.domain import EnrichedTrack, VectorStore

@@ -1,13 +1,9 @@
-"""Domain models for library sync operations."""
-
 from pydantic import BaseModel, ConfigDict, Field
 
 from .track import SavedTrack
 
 
 class SyncProgress(BaseModel):
-    """Progress update for library sync."""
-
     current: int
     total: int
     song_title: str
@@ -17,8 +13,6 @@ class SyncProgress(BaseModel):
 
 
 class EnrichedTrack(BaseModel):
-    """Track enriched with lyrics and AI-generated vibe description."""
-
     track: SavedTrack
     lyrics: str
     vibe_description: str | None = Field(

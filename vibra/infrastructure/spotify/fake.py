@@ -1,5 +1,3 @@
-"""In-process Spotify fake for tests and local dev without the Spotify API."""
-
 from collections.abc import AsyncIterator
 from dataclasses import dataclass, field
 
@@ -8,8 +6,6 @@ from vibra.domain import SavedTrack, SpotifyArtist, SpotifyUser
 
 @dataclass
 class FakeSpotifyClient:
-    """Implements MusicLibrary without hitting the Spotify API."""
-
     tracks: list[SavedTrack] = field(default_factory=list)
     user: SpotifyUser = field(
         default_factory=lambda: SpotifyUser(

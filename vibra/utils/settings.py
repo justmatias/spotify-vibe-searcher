@@ -1,7 +1,5 @@
 # pylint: disable=invalid-name
-"""Application configuration using Pydantic BaseSettings."""
 
-from functools import lru_cache
 from pathlib import Path
 
 from pydantic import Field
@@ -9,8 +7,6 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class AppSettings(BaseSettings):
-    """Application settings loaded from environment variables."""
-
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
@@ -88,10 +84,4 @@ class AppSettings(BaseSettings):
         return self.DATA_DIR / "cache"
 
 
-@lru_cache
-def get_settings() -> AppSettings:
-    """Get cached application settings."""
-    return AppSettings()
-
-
-Settings = get_settings()
+Settings = AppSettings()

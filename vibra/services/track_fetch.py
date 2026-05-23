@@ -1,5 +1,3 @@
-"""Service for fetching saved tracks with genre-enriched artists."""
-
 from pydantic import BaseModel, ConfigDict
 
 from vibra.domain import MusicLibrary, SavedTrack, SpotifyArtist

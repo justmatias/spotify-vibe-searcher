@@ -1,5 +1,3 @@
-"""Fixtures for track analysis service tests."""
-
 import pytest
 from polyfactory.factories.pydantic_factory import ModelFactory
 
@@ -10,7 +8,9 @@ from vibra.services import TrackAnalysisService
 
 @pytest.fixture
 def llm_client() -> FakeLLMClient:
-    return FakeLLMClient(response="An indie rock track with nostalgic themes and emotional depth.")
+    return FakeLLMClient(
+        response="An indie rock track with nostalgic themes and emotional depth."
+    )
 
 
 @pytest.fixture

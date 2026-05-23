@@ -1,5 +1,3 @@
-"""Thin async-generator orchestrator for library sync."""
-
 from collections.abc import AsyncGenerator
 
 from pydantic import BaseModel

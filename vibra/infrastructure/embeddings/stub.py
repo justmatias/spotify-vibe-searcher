@@ -1,5 +1,3 @@
-"""Deterministic stub embedding function — no Ollama required."""
-
 import hashlib
 
 from chromadb import EmbeddingFunction, Embeddings

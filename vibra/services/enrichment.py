@@ -1,5 +1,3 @@
-"""Service for enriching a track with lyrics and a vibe description."""
-
 from pydantic import BaseModel, ConfigDict
 
 from vibra.domain import EnrichedTrack, LyricsProvider, SavedTrack

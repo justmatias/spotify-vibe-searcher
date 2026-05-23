@@ -1,5 +1,3 @@
-"""Fixtures for search service tests."""
-
 import asyncio
 import uuid
 

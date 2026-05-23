@@ -1,5 +1,3 @@
-"""ChromaDB vector database repository."""
-
 import asyncio
 from functools import cached_property
 
@@ -20,8 +18,6 @@ from .mappers import (
 
 
 class VectorDBRepository(BaseModel):
-    """Repository for ChromaDB vector database operations."""
-
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
     client: ClientAPI

@@ -1,5 +1,3 @@
-"""Fixtures for library sync service tests."""
-
 import uuid
 
 import chromadb
@@ -38,7 +36,9 @@ def make_library_sync_service(
         track_fetch=TrackFetchService(music_library=FakeSpotifyClient(tracks=tracks)),
         enrichment=EnrichmentService(
             lyrics=FakeGeniusClient(lyrics=lyrics_value),
-            analyzer=TrackAnalysisService(llm_client=FakeLLMClient(response=vibe_value)),
+            analyzer=TrackAnalysisService(
+                llm_client=FakeLLMClient(response=vibe_value)
+            ),
         ),
         indexing=IndexingService(
             store=VectorDBRepository(

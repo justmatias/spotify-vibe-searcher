@@ -4,7 +4,6 @@ from vibra.domain import OAuthToken, SavedTrack, SpotifyArtist, SpotifyUser
 
 
 def to_user(payload: dict[str, Any]) -> SpotifyUser:
-    """Create SpotifyUser from Spotify API response."""
     images = payload.get("images", [])
     image_url = images[0]["url"] if images else None
     return SpotifyUser(

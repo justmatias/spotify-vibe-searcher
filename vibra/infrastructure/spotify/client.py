@@ -1,5 +1,3 @@
-"""Spotify API client wrapper using spotipy."""
-
 import asyncio
 from collections.abc import AsyncIterator
 from functools import cached_property
