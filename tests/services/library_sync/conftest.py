@@ -87,4 +87,4 @@ def library_sync_service(
     realistic_liked_songs: list[SavedTrack],
 ) -> LibrarySyncService:
     test_container.infrastructure.spotify_client().tracks = realistic_liked_songs
-    return test_container.services.library_sync_service()
+    return test_container.services.library_sync_service()  # type: ignore[no-any-return]

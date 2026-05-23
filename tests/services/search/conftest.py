@@ -13,12 +13,12 @@ from vibra.services import SearchService
 
 @pytest.fixture
 def vector_store(test_container: TestContainer) -> VectorDBRepository:
-    return test_container.infrastructure.vectordb_repository()
+    return test_container.infrastructure.vectordb_repository()  # type: ignore[no-any-return]
 
 
 @pytest.fixture
 def search_service(test_container: TestContainer) -> SearchService:
-    return test_container.services.search_service()
+    return test_container.services.search_service()  # type: ignore[no-any-return]
 
 
 @pytest.fixture

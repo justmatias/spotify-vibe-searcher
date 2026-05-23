@@ -1,6 +1,10 @@
 from dependency_injector import containers, providers
 
-from .containers import InfrastructureContainer, ServicesContainer, TestInfrastructureContainer
+from .containers import (
+    InfrastructureContainer,
+    ServicesContainer,
+    TestInfrastructureContainer,
+)
 
 
 class ProductionContainer(containers.DeclarativeContainer):

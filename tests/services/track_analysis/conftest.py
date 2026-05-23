@@ -11,12 +11,12 @@ from vibra.services import TrackAnalysisService
 
 @pytest.fixture
 def llm_client(test_container: TestContainer) -> FakeLLMClient:
-    return test_container.infrastructure.llm_client()
+    return test_container.infrastructure.llm_client()  # type: ignore[no-any-return]
 
 
 @pytest.fixture
 def track_analysis_service(test_container: TestContainer) -> TrackAnalysisService:
-    return test_container.services.track_analysis_service()
+    return test_container.services.track_analysis_service()  # type: ignore[no-any-return]
 
 
 @pytest.fixture
