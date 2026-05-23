@@ -1,34 +1,36 @@
 # pylint: disable=invalid-name
-"""Application configuration using Pydantic BaseSettings."""
 
+import os
 from functools import lru_cache
 from pathlib import Path
+from typing import Literal
 
-from pydantic import Field
+from dotenv import dotenv_values, load_dotenv
+from polyfactory.factories.pydantic_factory import ModelFactory
+from pydantic import Field, ValidationError
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+from .logger import LogLevel, log
 
 
 class AppSettings(BaseSettings):
-    """Application settings loaded from environment variables."""
-
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
         case_sensitive=False,
+        extra="ignore",
     )
 
+    ENVIRONMENT: Literal["testing", "production"] = "testing"
+
     # Spotify API Configuration
-    SPOTIFY_CLIENT_ID: str = Field(
-        description="Spotify API Client ID",
-        default="TEST_SPOTIFY_CLIENT_ID",
-    )
+    SPOTIFY_CLIENT_ID: str = Field(description="Spotify API Client ID")
     SPOTIFY_CLIENT_SECRET: str = Field(
         description="Spotify API Client Secret",
-        default="TEST_SPOTIFY_CLIENT_SECRET",
     )
     SPOTIFY_REDIRECT_URI: str = Field(
         description="OAuth redirect URI registered",
-        default="TEST_SPOTIFY_REDIRECT_URI",
+        default="http://127.0.0.1:8501/callback",
     )
     SPOTIFY_SCOPES: str = Field(
         default="user-library-read user-read-private user-read-email",
@@ -36,10 +38,7 @@ class AppSettings(BaseSettings):
     )
 
     # Genius API Configuration
-    GENIUS_API_KEY: str = Field(
-        description="Genius API Key",
-        default="TEST_GENIUS_API_KEY",
-    )
+    GENIUS_API_KEY: str = Field(description="Genius API Key")
 
     # Application Paths
     DATA_DIR: Path = Field(
@@ -88,10 +87,38 @@ class AppSettings(BaseSettings):
         return self.DATA_DIR / "cache"
 
 
+class AppSettingsFactory(ModelFactory[AppSettings]):
+    __model__ = AppSettings
+    __use_defaults__ = True
+
+
 @lru_cache
 def get_settings() -> AppSettings:
-    """Get cached application settings."""
-    return AppSettings()
+    load_dotenv()
+    environment = os.getenv("ENVIRONMENT", "testing").lower()
+
+    def load_test_settings() -> AppSettings:
+        log("Loading test settings...")
+        overrides = {k: v for k, v in dotenv_values(".env").items() if v}
+        log(
+            f"Overriding factory values from .env: {list(overrides.keys())}",
+            LogLevel.WARNING,
+        )
+        return AppSettingsFactory.build(**overrides)  # type: ignore[arg-type]
+
+    def load_production_settings() -> AppSettings:  # pragma: no cover
+        log("Loading production settings...")
+        try:
+            return AppSettings()  # type: ignore[call-arg]
+        except ValidationError as e:
+            log(f"Error loading production settings: {e}", LogLevel.ERROR)
+            raise
+
+    loaders = {
+        "production": load_production_settings,
+        "testing": load_test_settings,
+    }
+    return loaders[environment]()
 
 
 Settings = get_settings()

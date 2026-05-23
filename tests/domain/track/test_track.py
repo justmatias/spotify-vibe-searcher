@@ -1,7 +1,6 @@
 from polyfactory.factories.pydantic_factory import ModelFactory
 
-from vibra.domain.track import (
-    SavedTrack,
+from vibra.domain import (
     SpotifyAlbum,
     SpotifyArtist,
     SpotifyTrack,
@@ -24,29 +23,6 @@ def test_spotify_track_properties(
     assert track_with_artists.artist_names == "Artist One, Artist Two"
     assert track_with_artists.spotify_url == "http://spotify.com/track/123"
     assert track_without_spotify_url.spotify_url == ""
-
-
-def test_spotify_artist_from_api_response() -> None:
-    data = {
-        "id": "123",
-        "name": "Test Artist",
-        "uri": "spotify:artist:123",
-        "href": "http://api.spotify.com",
-        "external_urls": {},
-    }
-    artist = SpotifyArtist.from_api_response(data)
-    assert artist.id_ == "123"
-    assert artist.name == "Test Artist"
-
-
-def test_saved_track_from_api_response(
-    spotify_track_factory: ModelFactory[SpotifyTrack],
-) -> None:
-    track_data = spotify_track_factory.build().model_dump(by_alias=True)
-    data = {"added_at": "2023-01-01T00:00:00", "track": track_data}
-    saved_track = SavedTrack.from_api_response(data)
-    assert saved_track.added_at.year == 2023
-    assert saved_track.track.id_ == track_data["id"]
 
 
 def test_genre_names_with_multiple_genres(

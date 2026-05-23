@@ -4,7 +4,6 @@ from vibra.domain import SearchResults
 from vibra.services import SearchService
 
 
-@pytest.mark.vcr
 @pytest.mark.asyncio
 @pytest.mark.usefixtures("_populate_search_tracks")
 async def test_search_by_vibe_returns_search_results_domain_model(
@@ -18,10 +17,9 @@ async def test_search_by_vibe_returns_search_results_domain_model(
     assert result.has_results
 
 
-@pytest.mark.vcr
 @pytest.mark.asyncio
 @pytest.mark.usefixtures("_populate_search_tracks")
-async def test_similarity_score_conversion_from_distance(
+async def test_similarity_score_is_in_valid_range(
     search_service: SearchService,
 ) -> None:
     result = await search_service.search_by_vibe("test query", n_results=10)
@@ -30,7 +28,6 @@ async def test_similarity_score_conversion_from_distance(
         assert 0.0 <= search_result.similarity_score <= 1.0
 
 
-@pytest.mark.vcr
 @pytest.mark.asyncio
 async def test_empty_results_returns_valid_domain_model(
     search_service: SearchService,
@@ -41,3 +38,13 @@ async def test_empty_results_returns_valid_domain_model(
     assert result.total_results == 0
     assert not result.has_results
     assert result.query == "nonexistent vibe"
+
+
+@pytest.mark.asyncio
+@pytest.mark.usefixtures("_populate_search_tracks")
+async def test_search_respects_n_results_limit(
+    search_service: SearchService,
+) -> None:
+    result = await search_service.search_by_vibe("any query", n_results=2)
+
+    assert result.total_results <= 2

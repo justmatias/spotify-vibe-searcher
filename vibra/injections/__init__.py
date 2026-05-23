@@ -1,9 +1,23 @@
-"""Dependency injection module."""
+from vibra.utils import Settings
 
-from .container import Container
-from .containers import InfrastructureContainer, ServicesContainer
+from .container import Container, ProductionContainer, TestContainer
+from .containers import (
+    InfrastructureContainer,
+    ServicesContainer,
+    TestInfrastructureContainer,
+)
 
-# Singleton container instance
-container = Container()
+# Select the singleton container based on the current environment so that
+# production always uses real clients and the test runner uses fakes without
+# any extra fixture setup.
+container = TestContainer() if Settings.ENVIRONMENT == "testing" else ProductionContainer()
 
-__all__ = ["Container", "InfrastructureContainer", "ServicesContainer", "container"]
+__all__ = [
+    "Container",
+    "InfrastructureContainer",
+    "ProductionContainer",
+    "ServicesContainer",
+    "TestContainer",
+    "TestInfrastructureContainer",
+    "container",
+]

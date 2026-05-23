@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class SearchResult(BaseModel):
@@ -12,6 +12,8 @@ class SearchResult(BaseModel):
     popularity: int = Field(default=0)
     spotify_url: str = Field(default="")
 
+    model_config = ConfigDict(frozen=True)
+
     @property
     def similarity_score(self) -> float:
         """Similarity score computed from distance (0-1, higher is better)."""
@@ -22,6 +24,8 @@ class SearchResults(BaseModel):
     query: str
     results: list[SearchResult] = Field(default_factory=list)
     total_results: int
+
+    model_config = ConfigDict(frozen=True)
 
     @property
     def has_results(self) -> bool:

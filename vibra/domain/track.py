@@ -1,15 +1,15 @@
 """Domain models for Spotify tracks and albums."""
 
 from datetime import datetime
-from typing import Any, Self
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class SpotifyImage(BaseModel):
     url: str
     height: int | None = None
     width: int | None = None
+    model_config = ConfigDict(frozen=True)
 
 
 class SpotifyArtist(BaseModel):
@@ -19,10 +19,7 @@ class SpotifyArtist(BaseModel):
     href: str
     external_urls: dict[str, str]
     genres: list[str] = Field(default_factory=list)
-
-    @classmethod
-    def from_api_response(cls, data: dict[str, Any]) -> Self:
-        return cls(**data)
+    model_config = ConfigDict(frozen=True)
 
     @property
     def genre_names(self) -> str:
@@ -43,6 +40,8 @@ class SpotifyAlbum(BaseModel):
     def cover_image(self) -> str | None:
         return self.images[0].url if self.images else None
 
+    model_config = ConfigDict(frozen=True)
+
 
 class SpotifyTrack(BaseModel):
     id_: str = Field(alias="id")
@@ -56,6 +55,7 @@ class SpotifyTrack(BaseModel):
     external_urls: dict[str, str]
     preview_url: str | None = None
     is_playable: bool = True
+    model_config = ConfigDict(frozen=True)
 
     @property
     def artist_names(self) -> str:
@@ -75,11 +75,19 @@ class SpotifyTrack(BaseModel):
 class SavedTrack(BaseModel):
     added_at: datetime
     track: SpotifyTrack
-
-    @classmethod
-    def from_api_response(cls, data: dict[str, Any]) -> Self:
-        return cls(**data)
+    model_config = ConfigDict(frozen=True)
 
     @property
     def track_id(self) -> str:
         return self.track.id_
+
+
+class IndexedTrack(BaseModel):
+    id: str
+    track_name: str
+    artist_names: str
+    album_name: str
+    vibe_description: str
+    popularity: int
+    spotify_url: str
+    model_config = ConfigDict(frozen=True)

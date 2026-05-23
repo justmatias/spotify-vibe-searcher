@@ -25,7 +25,7 @@ def render_sync_library_section(access_token: str) -> None:
 
     if sync_clicked:
         # Configure container with access token
-        container.infrastructure.config.spotify.access_token.from_value(access_token)
+        container.infrastructure.config.spotify.access_token.from_value(access_token)  # type: ignore[attr-defined]
 
         # Get service from container
         sync_service = container.services.library_sync_service()

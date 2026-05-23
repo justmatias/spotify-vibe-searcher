@@ -1,21 +1,22 @@
 # pylint: disable=line-too-long
-import pathlib
-from collections.abc import Generator
+import asyncio
+import uuid
 
+import chromadb
 import pytest
 from polyfactory.factories.pydantic_factory import ModelFactory
 
 from vibra.domain import EnrichedTrack, SavedTrack
-from vibra.infrastructure import VectorDBRepository
-from vibra.utils import Settings
+from vibra.infrastructure import StubEmbeddingFunction, VectorDBRepository
 
 
 @pytest.fixture
-def vectordb_repository(tmp_path: pathlib.Path) -> Generator[VectorDBRepository]:
-    original_data_dir = Settings.DATA_DIR
-    Settings.DATA_DIR = tmp_path
-    yield VectorDBRepository()
-    Settings.DATA_DIR = original_data_dir
+def vectordb_repository() -> VectorDBRepository:
+    return VectorDBRepository(
+        client=chromadb.EphemeralClient(),
+        embedding_fn=StubEmbeddingFunction(),
+        collection_name=str(uuid.uuid4()),
+    )
 
 
 @pytest.fixture
@@ -93,7 +94,7 @@ def _populate_with_single_track(
     vectordb_repository: VectorDBRepository,
     enriched_track_with_vibe: EnrichedTrack,
 ) -> None:
-    vectordb_repository.add_track(enriched_track_with_vibe)
+    asyncio.run(vectordb_repository.add(enriched_track_with_vibe))
 
 
 @pytest.fixture
@@ -101,7 +102,7 @@ def _populate_with_batch(
     vectordb_repository: VectorDBRepository,
     enriched_tracks_batch: list[EnrichedTrack],
 ) -> None:
-    vectordb_repository.add_tracks(enriched_tracks_batch)
+    asyncio.run(vectordb_repository.add_many(enriched_tracks_batch))
 
 
 @pytest.fixture
@@ -109,4 +110,4 @@ def _populate_with_search_tracks(
     vectordb_repository: VectorDBRepository,
     enriched_tracks_for_search: list[EnrichedTrack],
 ) -> None:
-    vectordb_repository.add_tracks(enriched_tracks_for_search)
+    asyncio.run(vectordb_repository.add_many(enriched_tracks_for_search))
