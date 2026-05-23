@@ -1,35 +1,33 @@
-# pylint: disable=line-too-long, duplicate-code
 import asyncio
-import pathlib
-from collections.abc import Generator
+import uuid
 
+import chromadb
 import pytest
 from polyfactory.factories.pydantic_factory import ModelFactory
 
 from vibra.domain import EnrichedTrack, SavedTrack
-from vibra.infrastructure import LLMClient, VectorDBRepository
+from vibra.infrastructure import (
+    FakeLLMClient,
+    StubEmbeddingFunction,
+    VectorDBRepository,
+)
 from vibra.services import SearchService
-from vibra.utils import Settings
 
 
 @pytest.fixture
-def vectordb_repository(tmp_path: pathlib.Path) -> Generator[VectorDBRepository]:
-    """Fixture providing a VectorDBRepository with temporary storage."""
-    original_data_dir = Settings.DATA_DIR
-    Settings.DATA_DIR = tmp_path
-    yield VectorDBRepository()
-    Settings.DATA_DIR = original_data_dir
+def vector_store() -> VectorDBRepository:
+    return VectorDBRepository(
+        client=chromadb.EphemeralClient(),
+        embedding_fn=StubEmbeddingFunction(),
+        collection_name=str(uuid.uuid4()),
+    )
 
 
 @pytest.fixture
-def llm_client() -> LLMClient:
-    return LLMClient()
-
-
-@pytest.fixture
-def search_service(vectordb_repository: VectorDBRepository) -> SearchService:
+def search_service(vector_store: VectorDBRepository) -> SearchService:
     return SearchService(
-        vectordb_repository=vectordb_repository, llm_client=LLMClient()
+        vectordb_repository=vector_store,
+        llm_client=FakeLLMClient(response="refined vibe query"),
     )
 
 
@@ -39,27 +37,26 @@ def sample_query() -> str:
 
 
 @pytest.fixture
-def _populate_search_tracks(vectordb_repository: VectorDBRepository) -> None:
-
-    enriched_track_factory = ModelFactory.create_factory(EnrichedTrack)
-    saved_track_factory = ModelFactory.create_factory(SavedTrack)
-
+def _populate_search_tracks(
+    vector_store: VectorDBRepository,
+    enriched_track_factory: ModelFactory[EnrichedTrack],
+    saved_track_factory: ModelFactory[SavedTrack],
+) -> None:
     tracks = [
         enriched_track_factory.build(
             track=saved_track_factory.build(),
-            vibe_description="An upbeat pop song with catchy hooks and positive energy perfect for dancing",
+            vibe_description="An upbeat pop song with catchy hooks and positive energy",
             lyrics="Sample lyrics about happiness",
         ),
         enriched_track_factory.build(
             track=saved_track_factory.build(),
-            vibe_description="A melancholic indie track with introspective lyrics about lost love and regret",
+            vibe_description="A melancholic indie track with introspective lyrics about lost love",
             lyrics="Sample lyrics about heartbreak",
         ),
         enriched_track_factory.build(
             track=saved_track_factory.build(),
-            vibe_description="A dark and heavy metal track with aggressive guitar riffs and intense vocals",
+            vibe_description="A dark heavy metal track with aggressive guitar riffs",
             lyrics="Sample lyrics about anger",
         ),
     ]
-
-    asyncio.run(vectordb_repository.add_many(tracks))
+    asyncio.run(vector_store.add_many(tracks))

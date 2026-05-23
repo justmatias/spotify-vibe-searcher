@@ -1,110 +1,46 @@
-"""Library sync service for fetching and enriching Spotify tracks."""
-
-import asyncio
-from collections.abc import Generator
+from collections.abc import AsyncGenerator
 
 from pydantic import BaseModel
 
-from vibra.domain import EnrichedTrack, SavedTrack, SyncProgress
-from vibra.infrastructure import (
-    GeniusClient,
-    SpotifyClient,
-    VectorDBRepository,
-)
-from vibra.utils.logger import LogLevel, log
+from vibra.domain import EnrichedTrack, SyncProgress
+from vibra.utils import LogLevel, log
 
-from .track_analysis import TrackAnalysisService
+from .enrichment import EnrichmentService
+from .indexing import IndexingService
+from .track_fetch import TrackFetchService
 
 
 class LibrarySyncService(BaseModel):
-    spotify_client: SpotifyClient
-    genius_client: GeniusClient
-    track_analysis_service: TrackAnalysisService
-    vectordb_repository: VectorDBRepository
+    track_fetch: TrackFetchService
+    enrichment: EnrichmentService
+    indexing: IndexingService
 
-    def sync_library(
+    async def sync_library(
         self, limit: int = 20
-    ) -> Generator[SyncProgress | EnrichedTrack, None, None]:
+    ) -> AsyncGenerator[SyncProgress | EnrichedTrack, None]:
         log(f"Starting library sync (limit={limit})...", LogLevel.INFO)
 
-        # Phase 3: replace with async TrackFetchService
-        saved_tracks = self.spotify_client.get_all_liked_songs(  # type: ignore[attr-defined]
-            max_tracks=limit
-        )
-        self._enrich_artist_genres(saved_tracks)
-        total = len(saved_tracks)
+        tracks = await self.track_fetch.fetch(limit)
+        total = len(tracks)
         log(f"Found {total} tracks to process.", LogLevel.INFO)
 
-        for index, saved_track in enumerate(saved_tracks, start=1):
+        for i, saved_track in enumerate(tracks, start=1):
             yield SyncProgress(
-                current=index,
+                current=i,
                 total=total,
                 song_title=saved_track.track.name,
                 artist_name=saved_track.track.artist_names,
             )
-            yield from self._process_track(saved_track)
+
+            if await self.indexing.is_indexed(saved_track.track.id_):
+                log(
+                    f"Skipping '{saved_track.track.name}' — already indexed.",
+                    LogLevel.DEBUG,
+                )
+                continue
+
+            enriched = await self.enrichment.enrich(saved_track)
+            await self.indexing.index(enriched)
+            yield enriched
 
         log("Library sync completed.", LogLevel.INFO)
-
-    def _process_track(
-        self, saved_track: SavedTrack
-    ) -> Generator[EnrichedTrack, None, None]:
-        track = saved_track.track
-        if asyncio.run(self.vectordb_repository.track_exists(track.id_)):
-            log(f"Skipping '{track.name}' - already indexed.", LogLevel.DEBUG)
-            return
-
-        try:
-            enriched = self._enrich_track(saved_track)
-            if enriched.vibe_description:
-                asyncio.run(self.vectordb_repository.add(enriched))
-            yield enriched
-        except Exception as e:  # pragma: no cover  # noqa: BLE001
-            log(f"Failed to enrich '{track.name}': {e}", LogLevel.WARNING)
-
-    def _enrich_track(self, saved_track: SavedTrack) -> EnrichedTrack:
-        """Enrich a track with lyrics and vibe description."""
-        # Phase 3: replace with async EnrichmentService
-        lyrics = self.genius_client.search_song(  # type: ignore[attr-defined]
-            title=saved_track.track.name,
-            artist=saved_track.track.artist_names,
-        )
-        vibe_description = None
-
-        if lyrics:
-            vibe_description = asyncio.run(
-                self.track_analysis_service.analyze_track(
-                    saved_track=saved_track,
-                    lyrics=lyrics,
-                )
-            )
-
-        return EnrichedTrack(
-            track=saved_track,
-            lyrics=lyrics,
-            vibe_description=vibe_description,
-        )
-
-    def _enrich_artist_genres(self, saved_tracks: list[SavedTrack]) -> None:
-        """Enrich artist data with genres by fetching full artist details"""
-        artist_ids = [
-            artist.id_
-            for saved_track in saved_tracks
-            for artist in saved_track.track.artists
-        ]
-        # Phase 3: replace with async call + model_copy (frozen models)
-        artists_with_genres = self.spotify_client.get_artists(artist_ids)
-        artist_map = {  # type: ignore[attr-defined]
-            artist.id_: artist for artist in artists_with_genres  # type: ignore[attr-defined]
-        }
-
-        for saved_track in saved_tracks:
-            saved_track.track.artists = [  # type: ignore[misc]
-                artist_map.get(artist.id_, artist)
-                for artist in saved_track.track.artists
-            ]
-
-        log(
-            f"Enriched {len(artists_with_genres)} artists with genre data.",
-            LogLevel.INFO,
-        )

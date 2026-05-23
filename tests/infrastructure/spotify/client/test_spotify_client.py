@@ -1,7 +1,7 @@
 import pytest
 
 from vibra.domain import SavedTrack, SpotifyArtist, SpotifyUser
-from vibra.infrastructure.spotify import SpotifyClient
+from vibra.infrastructure import SpotifyClient
 
 
 @pytest.mark.asyncio
@@ -23,7 +23,9 @@ async def test_get_all_liked_songs(spotify_client: SpotifyClient) -> None:
 
 @pytest.mark.asyncio
 @pytest.mark.vcr
-async def test_get_artists(spotify_client: SpotifyClient, artist_ids: list[str]) -> None:
+async def test_get_artists(
+    spotify_client: SpotifyClient, artist_ids: list[str]
+) -> None:
     artists = await spotify_client.get_artists(artist_ids)
     assert len(artists) == len(artist_ids)
     assert all(isinstance(artist, SpotifyArtist) for artist in artists)

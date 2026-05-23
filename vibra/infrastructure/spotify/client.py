@@ -1,5 +1,3 @@
-"""Spotify API client wrapper using spotipy."""
-
 import asyncio
 from collections.abc import AsyncIterator
 from functools import cached_property
@@ -10,9 +8,8 @@ import stamina
 from pydantic import BaseModel
 from spotipy import Spotify
 
-from vibra.domain import SavedTrack, SpotifyUser
-from vibra.domain.track import SpotifyArtist
-from vibra.utils.logger import LogLevel, log
+from vibra.domain import SavedTrack, SpotifyArtist, SpotifyUser
+from vibra.utils import LogLevel, log
 
 from .config import RETRY_ON
 from .mappers import to_artist, to_saved_track, to_user
@@ -37,9 +34,9 @@ class SpotifyClient(BaseModel):
     def _fetch_page(self, limit: int = 50, offset: int = 0) -> dict[str, Any]:
         return self.client.current_user_saved_tracks(limit=limit, offset=offset)  # type: ignore[no-any-return]
 
-    async def read_liked_songs(self, max_tracks: int = 500) -> AsyncIterator[SavedTrack]:
-        log(f"Fetching up to {max_tracks} liked songs...", LogLevel.INFO)
-
+    async def read_liked_songs(
+        self, max_tracks: int = 500
+    ) -> AsyncIterator[SavedTrack]:
         offset = 0
         yielded = 0
         while offset < max_tracks:
@@ -51,7 +48,6 @@ class SpotifyClient(BaseModel):
                 yield to_saved_track(item)
                 yielded += 1
             offset += 50
-
         log(f"Fetched {yielded} liked songs.", LogLevel.INFO)
 
     @stamina.retry(on=RETRY_ON, attempts=3)

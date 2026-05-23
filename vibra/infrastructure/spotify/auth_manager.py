@@ -5,7 +5,7 @@ import stamina
 from pydantic import BaseModel
 from spotipy.oauth2 import CacheFileHandler, SpotifyOAuth, SpotifyOauthError
 
-from vibra.domain.user import OAuthToken
+from vibra.domain import OAuthToken
 from vibra.utils import LogLevel, Settings, log
 
 from .config import RETRY_ON

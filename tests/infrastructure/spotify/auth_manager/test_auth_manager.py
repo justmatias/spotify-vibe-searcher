@@ -2,8 +2,8 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from vibra.domain.user import OAuthToken
-from vibra.infrastructure.spotify.auth_manager import SpotifyAuthManager
+from vibra.domain import OAuthToken
+from vibra.infrastructure import SpotifyAuthManager
 
 
 @pytest.mark.usefixtures("setup_get_auth_url")

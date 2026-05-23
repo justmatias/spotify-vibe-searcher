@@ -1,6 +1,6 @@
 import pytest
 
-from vibra.infrastructure.genius.client import GeniusClient
+from vibra.infrastructure import GeniusClient
 
 
 @pytest.mark.asyncio

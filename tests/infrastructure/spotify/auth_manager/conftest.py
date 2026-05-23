@@ -4,7 +4,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 from spotipy.oauth2 import SpotifyOauthError
 
-from vibra.infrastructure.spotify.auth_manager import SpotifyAuthManager
+from vibra.infrastructure import SpotifyAuthManager
 
 VALID_TOKEN_DICT = {
     "access_token": "123",
@@ -33,9 +33,7 @@ CACHED_TOKEN_DICT = {
 
 @pytest.fixture
 def mock_spotify_oauth() -> Generator[MagicMock, None, None]:
-    with patch(
-        "vibra.infrastructure.spotify.auth_manager.SpotifyOAuth"
-    ) as mock_cls:
+    with patch("vibra.infrastructure.spotify.auth_manager.SpotifyOAuth") as mock_cls:
         yield mock_cls
 
 

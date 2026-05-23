@@ -1,12 +1,10 @@
-"""ChromaDB vector database repository."""
-
 import asyncio
 from functools import cached_property
 
 import stamina
-from chromadb import Collection, PersistentClient
-from chromadb.utils.embedding_functions import OllamaEmbeddingFunction
-from pydantic import BaseModel
+from chromadb import Collection, EmbeddingFunction
+from chromadb.api import ClientAPI
+from pydantic import BaseModel, ConfigDict
 
 from vibra.domain import EnrichedTrack, IndexedTrack, SearchResults
 from vibra.utils import LogLevel, Settings, log
@@ -20,21 +18,21 @@ from .mappers import (
 
 
 class VectorDBRepository(BaseModel):
-    """Repository for ChromaDB vector database operations."""
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
+    client: ClientAPI
+    embedding_fn: EmbeddingFunction
+    collection_name: str = Settings.CHROMADB_COLLECTION
 
     @cached_property
     def collection(self) -> Collection:
-        Settings.CHROMADB_PATH.mkdir(parents=True, exist_ok=True)
         log(
-            f"Initializing ChromaDB client at {Settings.CHROMADB_PATH}",
+            f"Initializing ChromaDB collection '{self.collection_name}'",
             LogLevel.INFO,
         )
-        client = PersistentClient(path=str(Settings.CHROMADB_PATH))
-        return client.get_or_create_collection(
-            name=Settings.CHROMADB_COLLECTION,
-            embedding_function=OllamaEmbeddingFunction(
-                model_name=Settings.EMBEDDING_MODEL
-            ),
+        return self.client.get_or_create_collection(
+            name=self.collection_name,
+            embedding_function=self.embedding_fn,
             metadata={"hnsw:space": "cosine"},
         )
 

@@ -5,6 +5,7 @@ from .exceptions import (
     VectorStoreError,
     VibraError,
 )
+from .ports import AuthProvider, LLMProvider, LyricsProvider, MusicLibrary, VectorStore
 from .search import SearchResult, SearchResults
 from .sync import EnrichedTrack, SyncProgress
 from .track import (
@@ -19,10 +20,14 @@ from .user import OAuthToken, SpotifyUser
 
 __all__ = [
     "AuthError",
+    "AuthProvider",
     "EnrichedTrack",
     "EnrichmentError",
     "IndexedTrack",
+    "LLMProvider",
     "LyricsNotFoundError",
+    "LyricsProvider",
+    "MusicLibrary",
     "OAuthToken",
     "SavedTrack",
     "SearchResult",
@@ -33,6 +38,7 @@ __all__ = [
     "SpotifyTrack",
     "SpotifyUser",
     "SyncProgress",
+    "VectorStore",
     "VectorStoreError",
     "VibraError",
 ]
