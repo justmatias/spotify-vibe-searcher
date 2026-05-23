@@ -34,6 +34,7 @@ class SpotifyAuthManager(BaseModel):
     @stamina.retry(on=RETRY_ON, attempts=3)
     def _exchange_code_sync(self, code: str) -> OAuthToken | None:
         try:
+            self.clear_cache()
             token_info = self.oauth.get_access_token(code, as_dict=True)
             return to_token(token_info)
         except SpotifyOauthError as e:
@@ -46,7 +47,7 @@ class SpotifyAuthManager(BaseModel):
     async def cached_token(self) -> OAuthToken | None:
         def _get() -> OAuthToken | None:
             token_info = self.oauth.cache_handler.get_cached_token()
-            if not token_info:
+            if not token_info or "expires_at" not in token_info:
                 return None
             token_info = self.oauth.validate_token(token_info)
             return to_token(token_info)

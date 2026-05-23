@@ -1,6 +1,6 @@
-from datetime import datetime
+from datetime import UTC, datetime
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class SpotifyUser(BaseModel):
@@ -16,9 +16,12 @@ class SpotifyUser(BaseModel):
 
 class OAuthToken(BaseModel):
     access_token: str
-    refresh_token: str
-    expires_at: datetime
-    scope: str
     token_type: str
+    expires_in: int
+    refresh_token: str | None = None
+    scope: str = ""
+    created_at: datetime = Field(
+        default_factory=lambda: datetime.now(UTC)
+    )
 
     model_config = ConfigDict(frozen=True)

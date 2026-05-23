@@ -29,39 +29,44 @@ repos:
       - id: bandit
         args: ['-r', '-lll']
 
+  - repo: https://github.com/justmatias/pre-commit-uv-sync
+    rev: v1.0.0
+    hooks:
+      - id: sync-uv-additional-deps
+
   - repo: https://github.com/pylint-dev/pylint
     rev: v4.0.5
     hooks:
       - id: pylint
         types: [python]
         additional_dependencies:
+          - httpx==0.28.1
           - loguru==0.7.3
-          - pydantic==2.12.4
-          - pydantic-settings==2.12
-          - uvicorn==0.38.0
-          - lyricsgenius==3.7.5
-          - python-dotenv==1.2.1
-          - spotipy==2.25.2
-          - streamlit==1.52.2
-          - pytest==9.0.2
-          - polyfactory==3.2.0
-          - dependency-injector==4.48.3
-          - stamina==25.2.0
+          - pydantic==2.13.4
+          - pydantic-settings==2.14.1
+          - uvicorn==0.47.0
+          - lyricsgenius==3.12.2
+          - python-dotenv==1.2.2
+          - streamlit==1.57.0
+          - pytest==9.0.3
+          - polyfactory==3.3.0
+          - dependency-injector==4.49.0
+          - stamina==26.1.0
 
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: v2.1.0
     hooks:
       - id: mypy
         additional_dependencies:
+          - httpx==0.28.1
           - loguru==0.7.3
-          - pydantic==2.12.4
-          - pydantic-settings==2.12
-          - lyricsgenius==3.7.5
-          - python-dotenv==1.2.1
-          - spotipy==2.25.2
-          - streamlit==1.52.2
-          - pytest==9.0.2
-          - polyfactory==3.2.0
+          - pydantic==2.13.4
+          - pydantic-settings==2.14.1
+          - lyricsgenius==3.12.2
+          - python-dotenv==1.2.2
+          - streamlit==1.57.0
+          - pytest==9.0.3
+          - polyfactory==3.3.0
           - types-requests==2.32.4.20260107
-          - stamina==25.2.0
-          - dependency-injector==4.48.3
+          - stamina==26.1.0
+          - dependency-injector==4.49.0

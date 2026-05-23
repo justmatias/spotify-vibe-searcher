@@ -1,3 +1,5 @@
+import asyncio
+
 import streamlit as st
 
 from vibra.domain import EnrichedTrack, SyncProgress
@@ -38,7 +40,15 @@ def render_sync_library_section(access_token: str) -> None:
         enriched_tracks: list[EnrichedTrack] = []
 
         # Process library sync
-        for item in sync_service.sync_library(limit=track_limit):
+        async def _consume() -> list[SyncProgress | EnrichedTrack]:
+            items: list[SyncProgress | EnrichedTrack] = []
+            async for item in sync_service.sync_library(limit=track_limit):
+                items.append(item)
+            return items
+
+        sync_items = asyncio.run(_consume())
+
+        for item in sync_items:
             if isinstance(item, SyncProgress):
                 # Update progress
                 progress = item.current / item.total

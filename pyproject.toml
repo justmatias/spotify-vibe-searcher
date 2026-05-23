@@ -159,6 +159,7 @@ test = "pytest --cov=vibra --cov=tests --cov-report=term-missing:skip-covered"
 branch = "main"
 commit_message = "chore(release): release version {version}"
 version_variables = ["vibra/__init__.py:__version__"]
+version_toml = ["pyproject.toml:project.version"]
 
 [tool.semantic_release.branches.main]
 match = "(main|master)"
