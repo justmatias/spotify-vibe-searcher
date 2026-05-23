@@ -1,6 +1,3 @@
-import uuid
-
-import chromadb
 import pytest
 from polyfactory.factories.pydantic_factory import ModelFactory
 
@@ -11,43 +8,8 @@ from vibra.domain import (
     SpotifyArtist,
     SpotifyTrack,
 )
-from vibra.infrastructure import (
-    FakeGeniusClient,
-    FakeLLMClient,
-    FakeSpotifyClient,
-    StubEmbeddingFunction,
-    VectorDBRepository,
-)
-from vibra.services import (
-    EnrichmentService,
-    IndexingService,
-    LibrarySyncService,
-    TrackAnalysisService,
-    TrackFetchService,
-)
-
-
-def make_library_sync_service(
-    tracks: list[SavedTrack],
-    lyrics_value: str = "Some lyrics content",
-    vibe_value: str = "A vibe description.",
-) -> LibrarySyncService:
-    return LibrarySyncService(
-        track_fetch=TrackFetchService(music_library=FakeSpotifyClient(tracks=tracks)),
-        enrichment=EnrichmentService(
-            lyrics=FakeGeniusClient(lyrics=lyrics_value),
-            analyzer=TrackAnalysisService(
-                llm_client=FakeLLMClient(response=vibe_value)
-            ),
-        ),
-        indexing=IndexingService(
-            store=VectorDBRepository(
-                client=chromadb.EphemeralClient(),
-                embedding_fn=StubEmbeddingFunction(),
-                collection_name=str(uuid.uuid4()),
-            )
-        ),
-    )
+from vibra.injections import TestContainer
+from vibra.services import LibrarySyncService
 
 
 @pytest.fixture
@@ -121,6 +83,8 @@ def realistic_liked_songs(
 
 @pytest.fixture
 def library_sync_service(
+    test_container: TestContainer,
     realistic_liked_songs: list[SavedTrack],
 ) -> LibrarySyncService:
-    return make_library_sync_service(realistic_liked_songs)
+    test_container.infrastructure.spotify_client().tracks = realistic_liked_songs
+    return test_container.services.library_sync_service()

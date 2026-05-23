@@ -1,21 +1,22 @@
+"""Fixtures for track analysis service tests."""
+
 import pytest
 from polyfactory.factories.pydantic_factory import ModelFactory
 
 from vibra.domain import SavedTrack
 from vibra.infrastructure import FakeLLMClient
+from vibra.injections import TestContainer
 from vibra.services import TrackAnalysisService
 
 
 @pytest.fixture
-def llm_client() -> FakeLLMClient:
-    return FakeLLMClient(
-        response="An indie rock track with nostalgic themes and emotional depth."
-    )
+def llm_client(test_container: TestContainer) -> FakeLLMClient:
+    return test_container.infrastructure.llm_client()
 
 
 @pytest.fixture
-def track_analysis_service(llm_client: FakeLLMClient) -> TrackAnalysisService:
-    return TrackAnalysisService(llm_client=llm_client)
+def track_analysis_service(test_container: TestContainer) -> TrackAnalysisService:
+    return test_container.services.track_analysis_service()
 
 
 @pytest.fixture

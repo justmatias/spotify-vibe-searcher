@@ -1,9 +1,8 @@
 import pytest
 
 from vibra.domain import EnrichedTrack, SavedTrack, SyncProgress
+from vibra.injections import TestContainer
 from vibra.services import LibrarySyncService
-
-from .conftest import make_library_sync_service
 
 
 @pytest.mark.asyncio
@@ -60,9 +59,12 @@ async def test_sync_library_skips_already_indexed_tracks(
 
 @pytest.mark.asyncio
 async def test_sync_library_without_lyrics_skips_vibe_analysis(
+    test_container: TestContainer,
     realistic_liked_songs: list[SavedTrack],
 ) -> None:
-    service = make_library_sync_service(realistic_liked_songs, lyrics_value="")
+    test_container.infrastructure.spotify_client().tracks = realistic_liked_songs
+    test_container.infrastructure.genius_client().lyrics = ""
+    service = test_container.services.library_sync_service()
 
     results = [item async for item in service.sync_library(limit=1)]
 

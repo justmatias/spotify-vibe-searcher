@@ -1,34 +1,24 @@
-import asyncio
-import uuid
+"""Fixtures for search service tests."""
 
-import chromadb
+import asyncio
+
 import pytest
 from polyfactory.factories.pydantic_factory import ModelFactory
 
 from vibra.domain import EnrichedTrack, SavedTrack
-from vibra.infrastructure import (
-    FakeLLMClient,
-    StubEmbeddingFunction,
-    VectorDBRepository,
-)
+from vibra.infrastructure import VectorDBRepository
+from vibra.injections import TestContainer
 from vibra.services import SearchService
 
 
 @pytest.fixture
-def vector_store() -> VectorDBRepository:
-    return VectorDBRepository(
-        client=chromadb.EphemeralClient(),
-        embedding_fn=StubEmbeddingFunction(),
-        collection_name=str(uuid.uuid4()),
-    )
+def vector_store(test_container: TestContainer) -> VectorDBRepository:
+    return test_container.infrastructure.vectordb_repository()
 
 
 @pytest.fixture
-def search_service(vector_store: VectorDBRepository) -> SearchService:
-    return SearchService(
-        vectordb_repository=vector_store,
-        llm_client=FakeLLMClient(response="refined vibe query"),
-    )
+def search_service(test_container: TestContainer) -> SearchService:
+    return test_container.services.search_service()
 
 
 @pytest.fixture
