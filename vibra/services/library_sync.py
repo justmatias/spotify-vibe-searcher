@@ -27,7 +27,10 @@ class LibrarySyncService(BaseModel):
     ) -> Generator[SyncProgress | EnrichedTrack, None, None]:
         log(f"Starting library sync (limit={limit})...", LogLevel.INFO)
 
-        saved_tracks = self.spotify_client.get_all_liked_songs(max_tracks=limit)
+        # Phase 3: replace with async TrackFetchService
+        saved_tracks = self.spotify_client.get_all_liked_songs(  # type: ignore[attr-defined]
+            max_tracks=limit
+        )
         self._enrich_artist_genres(saved_tracks)
         total = len(saved_tracks)
         log(f"Found {total} tracks to process.", LogLevel.INFO)
@@ -61,7 +64,8 @@ class LibrarySyncService(BaseModel):
 
     def _enrich_track(self, saved_track: SavedTrack) -> EnrichedTrack:
         """Enrich a track with lyrics and vibe description."""
-        lyrics = self.genius_client.search_song(
+        # Phase 3: replace with async EnrichmentService
+        lyrics = self.genius_client.search_song(  # type: ignore[attr-defined]
             title=saved_track.track.name,
             artist=saved_track.track.artist_names,
         )
@@ -88,11 +92,14 @@ class LibrarySyncService(BaseModel):
             for saved_track in saved_tracks
             for artist in saved_track.track.artists
         ]
+        # Phase 3: replace with async call + model_copy (frozen models)
         artists_with_genres = self.spotify_client.get_artists(artist_ids)
-        artist_map = {artist.id_: artist for artist in artists_with_genres}
+        artist_map = {  # type: ignore[attr-defined]
+            artist.id_: artist for artist in artists_with_genres  # type: ignore[attr-defined]
+        }
 
         for saved_track in saved_tracks:
-            saved_track.track.artists = [
+            saved_track.track.artists = [  # type: ignore[misc]
                 artist_map.get(artist.id_, artist)
                 for artist in saved_track.track.artists
             ]

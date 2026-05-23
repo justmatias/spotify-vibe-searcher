@@ -6,6 +6,7 @@ from vibra.domain import SearchResults
 from vibra.injections import container
 
 
+@st.fragment
 def render_search_section() -> None:
     """Render the semantic search section — always visible."""
     st.markdown("#### 🔍 Vibe Search")

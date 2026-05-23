@@ -14,9 +14,15 @@ from vibra.infrastructure import (
 class InfrastructureContainer(containers.DeclarativeContainer):
     """Container for infrastructure layer dependencies."""
 
-    # Factory — caller passes access_token at call time:
+    # Used by library_sync_service (Phase 3 will remove this config dependency)
+    config = providers.Configuration()
+
+    # Factory — callers may override access_token at call time:
     # container.infrastructure.spotify_client(access_token=token.access_token)
-    spotify_client = providers.Factory(SpotifyClient)
+    spotify_client = providers.Factory(
+        SpotifyClient,
+        access_token=config.spotify.access_token,
+    )
 
     # Singletons
     spotify_auth_manager = providers.Singleton(SpotifyAuthManager)

@@ -1,7 +1,7 @@
 import streamlit as st
 
 from vibra.domain import SpotifyUser
-from vibra.utils import Settings
+from vibra.injections import container
 
 DEFAULT_AVATAR = "https://i.scdn.co/image/ab6775700000ee8555c25988a6ac314394d3fbf5"
 
@@ -74,9 +74,7 @@ def _render_sidebar_profile(user: SpotifyUser) -> None:
         st.session_state.access_token = None
         st.session_state.user = None
 
-        cache_file = Settings.CACHE_PATH / ".spotify_cache"
-        if cache_file.exists():
-            cache_file.unlink()
+        container.infrastructure.spotify_auth_manager().clear_cache()
 
         st.rerun()
     st.markdown("</div>", unsafe_allow_html=True)

@@ -7,6 +7,7 @@ import streamlit as st
 from vibra.injections import container
 
 
+@st.fragment
 def render_library_section() -> None:
     """Render the library section showing indexed tracks with improved visuals."""
     st.markdown(
@@ -40,8 +41,8 @@ def render_library_section() -> None:
             "🗑️ Clear Database", key="clear_library", type="secondary"
         ):
             with st.spinner("Clearing database..."):
-                all_data = repository.get_all_tracks()
-                track_ids = all_data.get("ids", [])
+                tracks = asyncio.run(repository.list_all())
+                track_ids = [t.id for t in tracks]
                 if track_ids:
                     asyncio.run(repository.delete(track_ids))
                     st.success(f"✅ Deleted {len(track_ids)} tracks from database!")
@@ -49,34 +50,22 @@ def render_library_section() -> None:
 
     if count > 0:
         with st.spinner("Loading tracks..."):
-            data = repository.get_all_tracks()
+            tracks = asyncio.run(repository.list_all())
 
-            if not data or not data["ids"]:
-                st.info("No tracks found.")
-                return
+        if not tracks:
+            st.info("No tracks found.")
+            return
 
-            # Parse data into a format suitable for DataFrame
-            rows = []
-            ids = data["ids"]
-            metadatas = data.get("metadatas") or []
-            documents = data.get("documents") or []
-
-        for i, _ in enumerate(ids):
-            meta = metadatas[i] if i < len(metadatas) else {}
-            doc = documents[i] if i < len(documents) else ""
-
-            # Embed track name in URL fragment so LinkColumn can display it
-            track_name = meta.get("track_name", "Unknown")
-            spotify_url = meta.get("spotify_url", "")
-            track_link = f"{spotify_url}#{track_name}" if spotify_url else track_name
-
-            rows.append({
-                "Track": track_link,
-                "Artist": meta.get("artist_names", "Unknown"),
-                "Album": meta.get("album_name", "Unknown"),
-                "Vibe": doc,
-                "Popularity": meta.get("popularity", 0),
-            })
+        rows = [
+            {
+                "Track": f"{t.spotify_url}#{t.track_name}" if t.spotify_url else t.track_name,
+                "Artist": t.artist_names,
+                "Album": t.album_name,
+                "Vibe": t.vibe_description,
+                "Popularity": t.popularity,
+            }
+            for t in tracks
+        ]
 
         df = pd.DataFrame(rows)
 
