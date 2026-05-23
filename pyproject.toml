@@ -148,7 +148,7 @@ omit = ["vibra/ui/*"]
 dev = "streamlit run vibra/main.py"
 format = "pre-commit run --all-files --verbose"
 build = "pip install -e ."
-test = "pytest --cov=vibra --cov-report=term-missing:skip-covered"
+test = "pytest --cov=vibra --cov=tests --cov-report=term-missing:skip-covered"
 
 
 ##################################

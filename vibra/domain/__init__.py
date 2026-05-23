@@ -1,10 +1,21 @@
+from .exceptions import (
+    AuthError,
+    EnrichmentError,
+    LyricsNotFoundError,
+    VectorStoreError,
+    VibraError,
+)
 from .search import SearchResult, SearchResults
 from .sync import EnrichedTrack, SyncProgress
 from .track import SavedTrack, SpotifyAlbum, SpotifyArtist, SpotifyImage, SpotifyTrack
-from .user import SpotifyUser
+from .user import OAuthToken, SpotifyUser
 
 __all__ = [
+    "AuthError",
     "EnrichedTrack",
+    "EnrichmentError",
+    "LyricsNotFoundError",
+    "OAuthToken",
     "SavedTrack",
     "SearchResult",
     "SearchResults",
@@ -14,4 +25,6 @@ __all__ = [
     "SpotifyTrack",
     "SpotifyUser",
     "SyncProgress",
+    "VectorStoreError",
+    "VibraError",
 ]

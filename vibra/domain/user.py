@@ -1,6 +1,6 @@
-from typing import Any, Self
+from datetime import datetime
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
 class SpotifyUser(BaseModel):
@@ -11,19 +11,12 @@ class SpotifyUser(BaseModel):
     product: str | None
     image_url: str | None
     followers: int
+    model_config = ConfigDict(frozen=True)
 
-    @classmethod
-    def from_api_response(cls, data: dict[str, Any]) -> Self:
-        """Create SpotifyUser from Spotify API response."""
-        images = data.get("images", [])
-        image_url = images[0]["url"] if images else None
 
-        return cls(
-            id=data["id"],
-            display_name=data.get("display_name", data["id"]),
-            email=data.get("email"),
-            country=data.get("country"),
-            product=data.get("product"),
-            image_url=image_url,
-            followers=data.get("followers", {}).get("total", 0),
-        )
+class OAuthToken(BaseModel):
+    access_token: str
+    refresh_token: str
+    expires_at: datetime
+    scope: list[str]
+    token_type: str
