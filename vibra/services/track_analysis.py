@@ -1,14 +1,16 @@
 import contextlib
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 from vibra.domain import SavedTrack
-from vibra.infrastructure import LLMClient
+from vibra.infrastructure.protocols import LLMProvider
 from vibra.utils import LogLevel, log
 
 
 class TrackAnalysisService(BaseModel):
-    llm_client: LLMClient
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
+    llm_client: LLMProvider
 
     def _build_analysis_prompt(self, saved_track: SavedTrack, lyrics: str) -> str:  # pylint: disable=no-self-use
         genres = []
