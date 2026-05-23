@@ -1,5 +1,3 @@
-"""Pure unit tests for vectordb mappers — no I/O, no ChromaDB."""
-
 import pytest
 from polyfactory.factories.pydantic_factory import ModelFactory
 
@@ -29,13 +27,17 @@ def test_enriched_to_payload_sets_correct_id(enriched_track: EnrichedTrack) -> N
     assert payload["ids"] == [enriched_track.track_id]
 
 
-def test_enriched_to_payload_sets_vibe_as_document(enriched_track: EnrichedTrack) -> None:
+def test_enriched_to_payload_sets_vibe_as_document(
+    enriched_track: EnrichedTrack,
+) -> None:
     payload = enriched_to_payload(enriched_track)
 
     assert payload["documents"] == [enriched_track.vibe_description]
 
 
-def test_enriched_to_payload_metadata_has_track_fields(enriched_track: EnrichedTrack) -> None:
+def test_enriched_to_payload_metadata_has_track_fields(
+    enriched_track: EnrichedTrack,
+) -> None:
     payload = enriched_to_payload(enriched_track)
     meta = payload["metadatas"][0]
 
@@ -51,10 +53,22 @@ def test_chroma_query_to_results_returns_search_results() -> None:
         "documents": [["vibe one", "vibe two"]],
         "metadatas": [
             [
-                {"track_name": "Song A", "artist_names": "Artist A", "album_name": "Album A",
-                 "popularity": 80, "spotify_url": "https://spotify.com/a", "genres": "rock"},
-                {"track_name": "Song B", "artist_names": "Artist B", "album_name": "Album B",
-                 "popularity": 60, "spotify_url": "https://spotify.com/b", "genres": "pop"},
+                {
+                    "track_name": "Song A",
+                    "artist_names": "Artist A",
+                    "album_name": "Album A",
+                    "popularity": 80,
+                    "spotify_url": "https://spotify.com/a",
+                    "genres": "rock",
+                },
+                {
+                    "track_name": "Song B",
+                    "artist_names": "Artist B",
+                    "album_name": "Album B",
+                    "popularity": 60,
+                    "spotify_url": "https://spotify.com/b",
+                    "genres": "pop",
+                },
             ]
         ],
         "distances": [[0.1, 0.3]],
@@ -75,8 +89,18 @@ def test_chroma_query_to_results_similarity_score_in_range() -> None:
     raw: dict[str, list] = {
         "ids": [["t1"]],
         "documents": [["vibe"]],
-        "metadatas": [[{"track_name": "S", "artist_names": "A", "album_name": "Al",
-                        "popularity": 50, "spotify_url": "", "genres": ""}]],
+        "metadatas": [
+            [
+                {
+                    "track_name": "S",
+                    "artist_names": "A",
+                    "album_name": "Al",
+                    "popularity": 50,
+                    "spotify_url": "",
+                    "genres": "",
+                }
+            ]
+        ],
         "distances": [[0.25]],
     }
     results = chroma_query_to_results("q", raw)
@@ -85,7 +109,12 @@ def test_chroma_query_to_results_similarity_score_in_range() -> None:
 
 
 def test_chroma_query_to_results_empty_returns_no_results() -> None:
-    raw: dict[str, list] = {"ids": [[]], "documents": [[]], "metadatas": [[]], "distances": [[]]}
+    raw: dict[str, list] = {
+        "ids": [[]],
+        "documents": [[]],
+        "metadatas": [[]],
+        "distances": [[]],
+    }
 
     results = chroma_query_to_results("empty query", raw)
 
@@ -98,8 +127,13 @@ def test_chroma_get_to_indexed_tracks_returns_typed_list() -> None:
         "ids": ["track_1"],
         "documents": ["vibe description here"],
         "metadatas": [
-            {"track_name": "Song", "artist_names": "Artist", "album_name": "Album",
-             "popularity": 70, "spotify_url": "https://spotify.com/t"},
+            {
+                "track_name": "Song",
+                "artist_names": "Artist",
+                "album_name": "Album",
+                "popularity": 70,
+                "spotify_url": "https://spotify.com/t",
+            },
         ],
     }
 
