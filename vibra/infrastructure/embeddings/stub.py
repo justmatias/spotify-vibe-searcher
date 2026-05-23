@@ -21,18 +21,21 @@ class StubEmbeddingFunction(EmbeddingFunction[list[str]]):
     def name() -> str:
         return "stub"
 
-    def get_config(self) -> dict[str, object]:
+    def get_config(self) -> dict[str, object]:  # pylint: disable=no-self-use
         return {}
 
     @staticmethod
-    def build_from_config(config: dict[str, object]) -> "StubEmbeddingFunction":
+    def build_from_config(config: dict[str, object]) -> EmbeddingFunction[list[str]]:
+        _ = config
         return StubEmbeddingFunction()
 
-    def __call__(self, input: list[str]) -> Embeddings:
+    def __call__(self, input: list[str]) -> Embeddings:  # pylint: disable=redefined-builtin
         return [self._embed(text) for text in input]
 
     @staticmethod
     def _embed(text: str) -> list[float]:
         digest = hashlib.sha256(text.encode()).digest()  # 32 bytes
-        tiled = (digest * (StubEmbeddingFunction.DIM // 32 + 1))[: StubEmbeddingFunction.DIM]
+        tiled = (digest * (StubEmbeddingFunction.DIM // 32 + 1))[
+            : StubEmbeddingFunction.DIM
+        ]
         return [b / 255.0 for b in tiled]
