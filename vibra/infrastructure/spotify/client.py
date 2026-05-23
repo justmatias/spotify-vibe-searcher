@@ -1,5 +1,7 @@
 """Spotify API client wrapper using spotipy."""
 
+import asyncio
+from collections.abc import AsyncIterator
 from functools import cached_property
 from itertools import batched
 from typing import Any
@@ -13,6 +15,7 @@ from vibra.domain.track import SpotifyArtist
 from vibra.utils.logger import LogLevel, log
 
 from .config import RETRY_ON
+from .mappers import to_artist, to_saved_track, to_user
 
 
 class SpotifyClient(BaseModel):
@@ -22,52 +25,51 @@ class SpotifyClient(BaseModel):
     def client(self) -> Spotify:
         return Spotify(auth=self.access_token)
 
-    @property
-    def current_user(self) -> SpotifyUser:
-        user_data = self._fetch_current_user()
-        return SpotifyUser.from_api_response(user_data)
+    async def current_user(self) -> SpotifyUser:
+        user_data = await asyncio.to_thread(self._fetch_current_user)
+        return to_user(user_data)
 
     @stamina.retry(on=RETRY_ON, attempts=3)
     def _fetch_current_user(self) -> dict[str, Any]:
         return self.client.current_user()  # type: ignore[no-any-return]
 
     @stamina.retry(on=RETRY_ON, attempts=3)
-    def get_liked_songs(self, limit: int = 50, offset: int = 0) -> dict[str, Any]:
+    def _fetch_page(self, limit: int = 50, offset: int = 0) -> dict[str, Any]:
         return self.client.current_user_saved_tracks(limit=limit, offset=offset)  # type: ignore[no-any-return]
 
-    def get_all_liked_songs(self, max_tracks: int = 500) -> list[SavedTrack]:
+    async def read_liked_songs(self, max_tracks: int = 500) -> AsyncIterator[SavedTrack]:
         log(f"Fetching up to {max_tracks} liked songs...", LogLevel.INFO)
 
-        all_tracks: list[SavedTrack] = []
         offset = 0
-
+        yielded = 0
         while offset < max_tracks:
-            items = self.get_liked_songs(limit=50, offset=offset).get("items", [])
+            page = await asyncio.to_thread(self._fetch_page, 50, offset)
+            items = page.get("items", [])
             if not items:
-                break  # pragma: no cover
-            all_tracks.extend(SavedTrack.from_api_response(item) for item in items)
+                break
+            for item in items[: max_tracks - offset]:
+                yield to_saved_track(item)
+                yielded += 1
             offset += 50
 
-        result = all_tracks[:max_tracks]
-        log(f"Fetched {len(result)} liked songs.", LogLevel.INFO)
-        return result
+        log(f"Fetched {yielded} liked songs.", LogLevel.INFO)
 
     @stamina.retry(on=RETRY_ON, attempts=3)
     def _fetch_artists_batch(self, batch: list[str]) -> dict[str, Any]:
         return self.client.artists(batch)  # type: ignore[no-any-return]
 
-    def get_artists(self, artist_ids: list[str]) -> list[SpotifyArtist]:
+    async def get_artists(self, artist_ids: list[str]) -> list[SpotifyArtist]:
         unique_ids = sorted(set(artist_ids))
         all_artists: list[SpotifyArtist] = []
 
         log(f"Fetching {len(unique_ids)} unique artists...", LogLevel.INFO)
 
         for batch in batched(unique_ids, 50):
-            response = self._fetch_artists_batch(list(batch))
+            response = await asyncio.to_thread(self._fetch_artists_batch, list(batch))
             for artist in response.get("artists", []):
                 if not artist:
                     continue  # pragma: no cover
-                all_artists.append(SpotifyArtist.from_api_response(artist))
+                all_artists.append(to_artist(artist))
 
         log(f"Retrieved {len(all_artists)} artists.", LogLevel.INFO)
         return all_artists

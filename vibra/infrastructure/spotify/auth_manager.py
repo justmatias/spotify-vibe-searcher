@@ -1,13 +1,14 @@
 from functools import cached_property
-from typing import Any
 
 import stamina
 from pydantic import BaseModel
 from spotipy.oauth2 import CacheFileHandler, SpotifyOAuth, SpotifyOauthError
 
+from vibra.domain.user import OAuthToken
 from vibra.utils import LogLevel, Settings, log
 
 from .config import RETRY_ON
+from .mappers import to_token
 
 
 class SpotifyAuthManager(BaseModel):
@@ -30,23 +31,26 @@ class SpotifyAuthManager(BaseModel):
         return self.oauth.get_authorize_url()  # type: ignore[no-any-return]
 
     @stamina.retry(on=RETRY_ON, attempts=3)
-    def get_access_token(self, code: str) -> dict[str, Any] | None:
+    def get_access_token(self, code: str) -> OAuthToken | None:
         try:
-            return self.oauth.get_access_token(code, as_dict=True)  # type: ignore[no-any-return]
+            token_info = self.oauth.get_access_token(code, as_dict=True)
+            return to_token(token_info)
         except SpotifyOauthError as e:
             log(f"Failed to get access token: {e}", LogLevel.WARNING)
             return None
 
-    def get_cached_token(self) -> dict[str, Any] | None:
+    def get_cached_token(self) -> OAuthToken | None:
         token_info = self.oauth.cache_handler.get_cached_token()
         if not token_info:
             return None
-        return self.oauth.validate_token(token_info)  # type: ignore[no-any-return]
+        token_info = self.oauth.validate_token(token_info)
+        return to_token(token_info)
 
     @stamina.retry(on=RETRY_ON, attempts=3)
-    def refresh_token(self, refresh_token: str) -> dict[str, Any] | None:
+    def refresh_token(self, refresh_token: str) -> OAuthToken | None:
         try:
-            return self.oauth.refresh_access_token(refresh_token)  # type: ignore[no-any-return]
+            token_info = self.oauth.refresh_access_token(refresh_token)
+            return to_token(token_info)
         except SpotifyOauthError as e:
             log(f"Failed to refresh token: {e}", LogLevel.WARNING)
             return None
