@@ -1,6 +1,24 @@
 # CHANGELOG
 
 
+## v0.9.2 (2026-05-24)
+
+### Bug Fixes
+
+- Streamline library sync process and enhance UI updates
+  ([`eb428d7`](https://github.com/justmatias/vibra/commit/eb428d79dda45ca29e835bad8c706ca7f39227a5))
+
+### Chores
+
+- **config**: Update pre-commit hooks and dependencies
+  ([`5bc2ffb`](https://github.com/justmatias/vibra/commit/5bc2ffb61e20871f8a01dcd1d56d5caa4b016834))
+
+### Refactoring
+
+- Improve user prompts and sync process in UI components
+  ([`8b78d2c`](https://github.com/justmatias/vibra/commit/8b78d2c248b8dca007e837d4a4ae10804e85bbd7))
+
+
 ## v0.9.1 (2026-05-23)
 
 ### Bug Fixes
