@@ -37,16 +37,28 @@ def render_library_section() -> None:
             st.rerun()
 
     with col3:
-        if count > 0 and st.button(
-            "🗑️ Clear Database", key="clear_library", type="secondary"
-        ):
-            with st.spinner("Clearing database..."):
-                tracks = asyncio.run(repository.list_all())
-                track_ids = [t.id for t in tracks]
-                if track_ids:
-                    asyncio.run(repository.delete(track_ids))
-                    st.success(f"✅ Deleted {len(track_ids)} tracks from database!")
+        if count > 0:
+            if not st.session_state.get("confirm_clear"):
+                if st.button("🗑️ Clear Database", key="clear_library", type="secondary"):
+                    st.session_state.confirm_clear = True
                     st.rerun()
+            else:
+                st.warning("This will delete all indexed tracks. Are you sure?")
+                yes_col, no_col = st.columns(2)
+                with yes_col:
+                    if st.button("✅ Yes, clear", key="confirm_clear_yes", type="primary"):
+                        with st.spinner("Clearing database..."):
+                            tracks = asyncio.run(repository.list_all())
+                            track_ids = [t.id for t in tracks]
+                            if track_ids:
+                                asyncio.run(repository.delete(track_ids))
+                                st.session_state.confirm_clear = False
+                                st.success(f"✅ Deleted {len(track_ids)} tracks from database!")
+                                st.rerun()
+                with no_col:
+                    if st.button("❌ Cancel", key="confirm_clear_no"):
+                        st.session_state.confirm_clear = False
+                        st.rerun()
 
     if count > 0:
         with st.spinner("Loading tracks..."):
@@ -86,7 +98,7 @@ def render_library_section() -> None:
                 ),
             },
             column_order=["Track", "Artist", "Album", "Vibe", "Popularity"],
-            width="stretch",
+            use_container_width=True,
             hide_index=True,
         )
     else:

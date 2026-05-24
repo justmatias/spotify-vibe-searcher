@@ -27,6 +27,9 @@ def render_search_section() -> None:
     with col_btn:
         search_button = st.button("🎯 Find My Vibe", type="primary")
 
+    if search_button and not query:
+        st.warning("Please describe a vibe or mood before searching.")
+
     if search_button and query:
         with st.spinner("🔎 Searching for matching vibes..."):
             search_service = container.services.search_service()

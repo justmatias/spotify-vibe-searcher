@@ -25,6 +25,15 @@ def render_sync_library_section(access_token: str) -> None:
     with col_btn:
         sync_clicked = st.button("📥 Sync Library")
 
+    secs = track_limit * 2
+    mins, rem = divmod(secs, 60)
+    time_str = f"~{mins} min {rem} sec" if mins else f"~{rem} sec"
+    st.caption(f"⚠️ Estimated time: {time_str} (~2 sec per song).")
+
+    # Show results from a previous sync (persisted across reruns for library refresh)
+    if not sync_clicked and st.session_state.get("last_sync_tracks"):
+        _render_sync_summary(st.container(), st.session_state.last_sync_tracks)
+
     if sync_clicked:
         # Configure container with access token
         container.infrastructure.config.spotify.access_token.from_value(access_token)  # type: ignore[attr-defined]
@@ -63,14 +72,13 @@ def render_sync_library_section(access_token: str) -> None:
 
         enriched_tracks = asyncio.run(_consume())
 
-        # Complete
+        # Persist results so the library section auto-refreshes via rerun
+        st.session_state.last_sync_tracks = enriched_tracks
         progress_bar.progress(1.0)
         status_container.success(
             f"✅ Successfully synced **{len(enriched_tracks)}** tracks!"
         )
-
-        # Display summary
-        _render_sync_summary(results_container, enriched_tracks)
+        st.rerun()
 
 
 def _render_sync_summary(

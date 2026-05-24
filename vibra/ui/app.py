@@ -77,7 +77,6 @@ def render_authenticated_view(user: SpotifyUser) -> None:
 
     # ── Sync ────────────────────────────────────────────────
     st.markdown("#### 📥 Sync Library")
-    st.caption("⚠️ Analyzing lyrics takes time (~2-3 sec per song).")
 
     render_sync_library_section(
         access_token=st.session_state.access_token,
