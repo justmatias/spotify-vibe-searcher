@@ -39,36 +39,29 @@ def render_sync_library_section(access_token: str) -> None:
 
         enriched_tracks: list[EnrichedTrack] = []
 
-        # Process library sync
-        async def _consume() -> list[SyncProgress | EnrichedTrack]:
-            items: list[SyncProgress | EnrichedTrack] = []
+        async def _consume() -> list[EnrichedTrack]:
+            tracks: list[EnrichedTrack] = []
             async for item in sync_service.sync_library(limit=track_limit):
-                items.append(item)
-            return items
-
-        sync_items = asyncio.run(_consume())
-
-        for item in sync_items:
-            if isinstance(item, SyncProgress):
-                # Update progress
-                progress = item.current / item.total
-                progress_bar.progress(progress)
-                status_container.markdown(
-                    f"""
-                    <div class="track-card" style="margin: 0;">
-                        <div class="track-number">{item.current}/{item.total}</div>
-                        <div class="track-info">
-                            <div class="track-name">{item.song_title}</div>
-                            <div class="track-artist">{item.artist_name}</div>
+                if isinstance(item, SyncProgress):
+                    progress_bar.progress(item.current / item.total)
+                    status_container.markdown(
+                        f"""
+                        <div class="track-card" style="margin: 0;">
+                            <div class="track-number">{item.current}/{item.total}</div>
+                            <div class="track-info">
+                                <div class="track-name">{item.song_title}</div>
+                                <div class="track-artist">{item.artist_name}</div>
+                            </div>
+                            <div class="track-badge lyrics">Processing…</div>
                         </div>
-                        <div class="track-badge lyrics">Processing…</div>
-                    </div>
-                    """,
-                    unsafe_allow_html=True,
-                )
-            elif isinstance(item, EnrichedTrack):
-                # Store enriched track
-                enriched_tracks.append(item)
+                        """,
+                        unsafe_allow_html=True,
+                    )
+                elif isinstance(item, EnrichedTrack):
+                    tracks.append(item)
+            return tracks
+
+        enriched_tracks = asyncio.run(_consume())
 
         # Complete
         progress_bar.progress(1.0)

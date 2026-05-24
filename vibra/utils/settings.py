@@ -1,7 +1,6 @@
 # pylint: disable=invalid-name
 
 import os
-from functools import lru_cache
 from pathlib import Path
 from typing import Literal
 
@@ -92,9 +91,8 @@ class AppSettingsFactory(ModelFactory[AppSettings]):
     __use_defaults__ = True
 
 
-@lru_cache
 def get_settings() -> AppSettings:
-    load_dotenv()
+    load_dotenv(override=True)
     environment = os.getenv("ENVIRONMENT", "testing").lower()
 
     def load_test_settings() -> AppSettings:
