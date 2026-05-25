@@ -30,29 +30,14 @@ Vibra syncs your Spotify liked songs, fetching track metadata and lyrics from Ge
 
 ## 🛠️ Tech Stack
 
-### Backend
-
-- **Language**: Python 3.12+
-- **Framework**: Pydantic for data validation
-- **Dependency Injection**: dependency-injector
-- **Testing**: pytest
-
-### Data Sources
-
-- **Spotify Web API**: Track metadata and audio features
-- **Genius API**: Song lyrics
-
-### AI & Vector Search
-
-- **LLM**: Ollama (Llama 3.2 3B)
-- **Embeddings**: Ollama nomic-embed-text
-- **Vector DB**: ChromaDB (local persistence)
-
-### UI
-
-- **Framework**: Streamlit
-- **Styling**: Custom CSS
-- **Components**: Modular, reusable UI components
+| Layer | Technology |
+|---|---|
+| Language | Python 3.12+ |
+| UI | Streamlit |
+| Data | Spotify Web API · Genius API |
+| AI | Ollama — Llama 3.2 3B · nomic-embed-text |
+| Vector DB | ChromaDB (local) |
+| Backend | Pydantic · dependency-injector · pytest |
 
 ## 🚀 Quick Start
 
