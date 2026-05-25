@@ -26,23 +26,7 @@ A **LLM-powered search engine** application that lets you search your Spotify "L
 
 ## 🧠 How it Works
 
-1. **Sync Your Library**
-
-   - Fetches your liked songs from Spotify
-   - Retrieves lyrics from Genius
-   - Analyzes each track with a local LLM to generate vibe descriptions
-
-2. **AI Analysis**
-
-   - Combines audio features (energy, valence, tempo) with lyrical content
-   - Generates rich, semantic descriptions like:
-     - _"An upbeat indie track with melancholic lyrics about lost love and nostalgia"_
-     - _"High-energy dance anthem with empowering lyrics about self-confidence"_
-
-3. **Semantic Search**
-   - Stores vibe descriptions as embeddings in ChromaDB
-   - Search using natural language: _"sad songs about heartbreak"_
-   - Returns tracks ranked by semantic similarity
+Vibra syncs your Spotify liked songs, fetching track metadata and lyrics from Genius, then sends each track through a local LLM to generate a rich semantic description — something like _"an upbeat indie track with melancholic lyrics about lost love and nostalgia"_ or _"a high-energy dance anthem with empowering lyrics about self-confidence"_. Those descriptions are stored as vector embeddings in a local ChromaDB instance. When you search, your query goes through the same LLM for refinement, then finds the closest matching tracks by cosine similarity.
 
 ## 🛠️ Tech Stack
 
@@ -60,7 +44,7 @@ A **LLM-powered search engine** application that lets you search your Spotify "L
 
 ### AI & Vector Search
 
-- **LLM**: Ollama (Llama 3.2 / Mistral)
+- **LLM**: Ollama (Llama 3.2 3B)
 - **Embeddings**: Ollama nomic-embed-text
 - **Vector DB**: ChromaDB (local persistence)
 
@@ -90,8 +74,8 @@ A **LLM-powered search engine** application that lets you search your Spotify "L
    curl -fsSL https://ollama.com/install.sh | sh
 
    # Pull required models
-   ollama pull llama3.2
-   ollama pull nomic-embed-text
+   ollama run llama3.2:3b
+   ollama pull nomic-embed-text:v1.5
    ```
 
 ### Installation
@@ -127,29 +111,6 @@ uv run poe dev
 
 Navigate to `http://localhost:8501` in your browser.
 
-## 📖 Usage
-
-### 1. Connect to Spotify
-
-- Click "Connect with Spotify" on the home page
-- Authorize the application
-
-### 2. Sync Your Library
-
-- Choose how many songs to analyze (5-100)
-- Click "Sync Library"
-- Wait for the AI to analyze each track (2-3 seconds per song)
-
-### 3. Search by Vibe
-
-- Click "Search Vibes"
-- Enter a natural language description:
-  - _"upbeat songs about summer"_
-  - _"melancholic indie tracks"_
-  - _"energetic workout music"_
-- Adjust the number of results
-- View matches with similarity scores
-
 ## 🏗️ Architecture
 
 ```
@@ -164,6 +125,7 @@ vibra/
 │   ├── library_sync.py      # Sync and enrich tracks
 │   ├── track_analysis.py    # AI vibe analysis
 │   └── search.py            # Semantic search
+├── injections/      # Dependency injection containers
 ├── ui/              # Streamlit interface
 │   └── components/  # Reusable UI components
 └── utils/           # Utilities (logging, settings)
