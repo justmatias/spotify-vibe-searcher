@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "vibra"
-version = "0.9.2"
+version = "0.9.3"
 description = "Vibra is a LLM-powered search engine application that allows you to search your personal Spotify liked songs library using natural language abstract descriptions"
 readme = "README.md"
 license = { text = "MIT" }
@@ -30,6 +30,7 @@ dependencies = [
 
 [project.urls]
 repository = "https://github.com/justmatias/vibra"
+
 
 
 [tool.setuptools]
@@ -184,6 +185,7 @@ name = "origin"
 type = "github"
 ignore_token_for_push = false
 insecure = false
+
 
 [dependency-groups]
 dev = [

@@ -1,6 +1,19 @@
 # CHANGELOG
 
 
+## v0.9.3 (2026-05-25)
+
+### Bug Fixes
+
+- **test**: Fix unit tests
+  ([`d0896fe`](https://github.com/justmatias/vibra/commit/d0896fe832b9364b9206eeb698079bacb591e224))
+
+### Chores
+
+- **docs**: Update readme
+  ([`2985526`](https://github.com/justmatias/vibra/commit/298552624f6ad5d964ca77d1ff7814a536196091))
+
+
 ## v0.9.2 (2026-05-24)
 
 ### Bug Fixes
