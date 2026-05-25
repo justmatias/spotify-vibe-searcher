@@ -17,7 +17,7 @@ class SpotifyUser(BaseModel):
 class OAuthToken(BaseModel):
     access_token: str
     token_type: str
-    expires_in: int
+    expires_at: float
     refresh_token: str | None = None
     scope: str = ""
     created_at: datetime = Field(

@@ -44,7 +44,7 @@ def render_sync_library_section(access_token: str) -> None:
         # Create progress containers
         progress_bar = st.progress(0)
         status_container = st.empty()
-        results_container = st.container()
+
 
         enriched_tracks: list[EnrichedTrack] = []
 
